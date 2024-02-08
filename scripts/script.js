@@ -126,7 +126,7 @@ document.addEventListener('DOMContentLoaded', function () {
           terminalText.innerHTML += newCommandPrompt;
           terminalText.innerHTML += 
           `<div><span class="ClickableLetter">
-            Help: command -> cd, ls, pwd, cat
+            Help: command -> cd, ls, pwd, cat , clear
           </span></div><br>`;
       }
   
