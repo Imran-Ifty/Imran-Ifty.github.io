@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Terminal</title>
+<link rel="stylesheet" href="styles/style.css">
+</head>
+
+
+<body>
+
+<div class="container">
+  <!-- Terminal -->
+  <div class="Terminal" id="terminal">
+    <div class="Terminal__Toolbar">
+      <div class="Toolbar__buttons">
+        <button class="Toolbar__button Toolbar__button--exit" onclick="toggleTerminal()">❌</button>
+        <button class="Toolbar__button">&#9472;</button>
+        <button class="Toolbar__button">&#9723;</button>
+      </div>
+      <p class="Toolbar__user">Imran@Ifty:~</p>
+    </div>
+    <div class="Terminal__body">
+      <div class="Terminal__text">Welcome to Imran's Terminal</div>
+      <div class="Terminal__Prompt">
+        <span class="Prompt__user">Imran@Ifty:</span><span class="Prompt__location">~</span><span class="Prompt__dollar">$</span>
+        <input class="Prompt__input" type="text">
+        <span class="Prompt__cursor"></span>
+      </div>
+    </div>
+  </div>
+  <!-- Terminal app -->
+  <div id="terminalApp" style="display: none; text-align: center; padding: 20px; background-color: transparent; color: #fff; border-radius: 10px; transition: transform 0.3s ease;">
+    <button onclick="toggleTerminal()" style="background: none; border: none; cursor: pointer;">
+      <img src="https://png2.cleanpng.com/sh/920209b773d553d9d2f95e9f0f566c99/L0KzQYm3VsI6N5x4jZH0aYP2gLBuTfNwdaF6jNd7LYTogr7wjvFtNZR0heJAdHX1PbrqjB50NZ1uhudDLXPyfsT2jPUufJZ3ReZucn3sfrLzTcVjO2c9faNqN0fmQoa5TsY5OWY9UKcEMUW2QIS3Uck4QGUASKc3cH7q/kisspng-computer-terminal-computer-icons-linux-console-ter-terminal-5b368e1a77c252.6815885915303019784905.png" alt="Toggle Terminal" style="width: 50px; height: 50px; transition: transform 0.3s ease;">
+      <div style="font-family: 'Ubuntu', sans-serif; font-size: 14px; margin-top: -5px;">Terminal</div>
+    </button>
+  </div>
+</div>
+
+<script src="scripts/script.js"></script>
+</body>
+</html>
