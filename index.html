@@ -2,22 +2,27 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>CVMaker — Professional Resume Builder</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300&family=DM+Sans:wght@300;400;500&family=DM+Mono&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <style>
-:root{--gold:#B8923A;--gold-light:#D4AC5A;--gold-dim:#8A6B2A;--ink:#1A1814;--sidebar:#171412;--sidebar-card:#201D1A;--sidebar-border:#2E2A26;--text-muted:#7A7068;--cv-accent:#2C3E50;--cv-gray:#F5F5F5;--radius:6px;--tr:0.18s ease;}
+:root{
+  --gold:#B8923A;--gold-light:#D4AC5A;--gold-dim:#8A6B2A;--ink:#1A1814;
+  --sidebar:#171412;--sidebar-card:#201D1A;--sidebar-border:#2E2A26;
+  --text-muted:#7A7068;--cv-accent:#2C3E50;--cv-gray:#F5F5F5;
+  --radius:6px;--tr:0.18s ease;
+}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'DM Sans',sans-serif;background:var(--sidebar);color:#E8E0D8;height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+body{font-family:'DM Sans',sans-serif;background:var(--sidebar);color:#E8E0D8;height:100dvh;display:flex;flex-direction:column;overflow:hidden;}
 
-/* TOPBAR */
-.topbar{background:var(--sidebar);border-bottom:1px solid var(--sidebar-border);padding:0 1.8rem;height:52px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;z-index:100;}
-.brand{font-family:'Playfair Display',serif;font-size:1.15rem;color:var(--gold);letter-spacing:0.04em;}
+/* ── TOPBAR ── */
+.topbar{background:var(--sidebar);border-bottom:1px solid var(--sidebar-border);padding:0 1rem;height:52px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;z-index:100;}
+.brand{font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--gold);letter-spacing:0.04em;white-space:nowrap;}
 .brand span{color:#E8E0D8;font-weight:400;}
-.topbar-right{display:flex;gap:0.55rem;}
-.btn{font-family:'DM Sans',sans-serif;font-size:0.79rem;font-weight:500;padding:0.4rem 1rem;border-radius:var(--radius);cursor:pointer;border:none;transition:var(--tr);letter-spacing:0.03em;}
+.topbar-right{display:flex;gap:0.4rem;align-items:center;}
+.btn{font-family:'DM Sans',sans-serif;font-size:0.79rem;font-weight:500;padding:0.4rem 1rem;border-radius:var(--radius);cursor:pointer;border:none;transition:var(--tr);letter-spacing:0.03em;white-space:nowrap;}
 .btn-gold{background:var(--gold);color:var(--ink);}
 .btn-gold:hover{background:var(--gold-light);}
 .btn-ghost{background:transparent;color:#B0A898;border:1px solid var(--sidebar-border);}
@@ -26,13 +31,16 @@ body{font-family:'DM Sans',sans-serif;background:var(--sidebar);color:#E8E0D8;he
 .btn-danger{background:transparent;color:#c0392b;border:1px solid #5a1a1a;font-size:0.72rem;padding:0.28rem 0.68rem;font-family:'DM Sans',sans-serif;cursor:pointer;border-radius:var(--radius);transition:var(--tr);}
 .btn-danger:hover{background:#3a0a0a;}
 
-/* LAYOUT */
-.app{display:grid;grid-template-columns:430px 1fr;flex:1;overflow:hidden;height:calc(100vh - 52px);}
+/* hide print/clear on very small screens */
+.hide-xs{display:inline-flex;}
 
-/* FORM PANEL */
+/* ── LAYOUT ── */
+.app{display:grid;grid-template-columns:430px 1fr;flex:1;overflow:hidden;height:calc(100dvh - 52px);}
+
+/* ── FORM PANEL ── */
 .form-panel{background:var(--sidebar);border-right:1px solid var(--sidebar-border);display:flex;flex-direction:column;overflow:hidden;}
 
-/* SLIDEABLE TABS */
+/* ── TABS ── */
 .tab-nav-wrap{position:relative;flex-shrink:0;background:var(--sidebar-card);border-bottom:1px solid var(--sidebar-border);}
 .tab-nav{display:flex;overflow-x:auto;scroll-behavior:smooth;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding:0 26px;}
 .tab-nav::-webkit-scrollbar{display:none;}
@@ -44,18 +52,20 @@ body{font-family:'DM Sans',sans-serif;background:var(--sidebar);color:#E8E0D8;he
 .tab-btn:hover{color:#C8BEB4;}
 .tab-btn.active{color:var(--gold);border-bottom-color:var(--gold);}
 
-/* TAB CONTENT */
+/* ── TAB CONTENT ── */
 .tab-slider{flex:1;overflow:hidden;}
 .tab-content{display:none;height:100%;overflow-y:auto;padding:1.35rem;}
 .tab-content.active{display:block;}
 .tab-content::-webkit-scrollbar{width:4px;}
 .tab-content::-webkit-scrollbar-thumb{background:var(--sidebar-border);border-radius:2px;}
 
-/* FORM */
+/* ── FORM ELEMENTS ── */
 .sec-label{font-family:'Playfair Display',serif;font-size:0.91rem;color:var(--gold-light);margin:1rem 0 0.6rem;padding-bottom:0.36rem;border-bottom:1px solid var(--sidebar-border);letter-spacing:0.02em;}
 .sec-label:first-child{margin-top:0;}
 .fg{display:grid;gap:0.65rem;margin-bottom:0.65rem;}
-.fg-1{grid-template-columns:1fr;}.fg-2{grid-template-columns:1fr 1fr;}.fg-3{grid-template-columns:1fr 1fr 1fr;}
+.fg-1{grid-template-columns:1fr;}
+.fg-2{grid-template-columns:1fr 1fr;}
+.fg-3{grid-template-columns:1fr 1fr 1fr;}
 .field{display:flex;flex-direction:column;gap:0.26rem;}
 .field label{font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);font-weight:500;}
 .field input,.field select,.field textarea{background:var(--sidebar-card);border:1px solid var(--sidebar-border);border-radius:var(--radius);color:#E8E0D8;font-family:'DM Sans',sans-serif;font-size:0.84rem;padding:0.44rem 0.66rem;outline:none;transition:var(--tr);width:100%;}
@@ -66,27 +76,27 @@ body{font-family:'DM Sans',sans-serif;background:var(--sidebar);color:#E8E0D8;he
 .field textarea{resize:vertical;min-height:66px;line-height:1.5;}
 .divider{height:1px;background:var(--sidebar-border);margin:0.8rem 0;}
 
-/* PHOTO */
+/* ── PHOTO ── */
 .photo-row{display:flex;align-items:center;gap:1rem;margin-bottom:0.9rem;}
 .photo-circle{width:80px;height:80px;border-radius:50%;border:2px dashed var(--sidebar-border);background:var(--sidebar-card);overflow:hidden;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:var(--tr);}
 .photo-circle:hover{border-color:var(--gold-dim);}
 .photo-circle img{width:100%;height:100%;object-fit:cover;display:none;}
 .photo-ph{display:flex;flex-direction:column;align-items:center;color:var(--text-muted);font-size:0.63rem;gap:0.22rem;}
 
-/* SIGNATURE BOX */
+/* ── SIGNATURE ── */
 .sig-box{background:var(--sidebar-card);border:1px dashed var(--sidebar-border);border-radius:var(--radius);padding:0.8rem;text-align:center;cursor:pointer;transition:var(--tr);min-height:70px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.35rem;margin-bottom:0.5rem;}
 .sig-box:hover{border-color:var(--gold-dim);}
 .sig-box img{max-height:50px;max-width:100%;display:none;}
 .sig-ph{font-size:0.74rem;color:var(--text-muted);line-height:1.5;}
 
-/* ENTRY CARDS */
+/* ── ENTRY CARDS ── */
 .entry-card{background:var(--sidebar-card);border:1px solid var(--sidebar-border);border-radius:var(--radius);padding:0.88rem;margin-bottom:0.62rem;}
 .entry-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.7rem;}
 .entry-num{font-size:0.66rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold-dim);font-weight:500;}
 .add-btn{display:flex;align-items:center;justify-content:center;gap:0.38rem;font-size:0.77rem;color:var(--gold);background:none;border:1px dashed var(--gold-dim);border-radius:var(--radius);padding:0.46rem 1rem;cursor:pointer;font-family:'DM Sans',sans-serif;width:100%;transition:var(--tr);margin-top:0.42rem;opacity:0.82;}
 .add-btn:hover{background:rgba(184,146,58,0.08);opacity:1;}
 
-/* TAGS */
+/* ── TAGS ── */
 .tw{background:var(--sidebar-card);border:1px solid var(--sidebar-border);border-radius:var(--radius);padding:0.44rem;display:flex;flex-wrap:wrap;gap:0.36rem;cursor:text;min-height:42px;transition:var(--tr);}
 .tw:focus-within{border-color:var(--gold-dim);}
 .tag{background:rgba(184,146,58,0.13);color:var(--gold-light);border:1px solid rgba(184,146,58,0.27);border-radius:3px;padding:0.16rem 0.44rem;font-size:0.76rem;display:flex;align-items:center;gap:0.26rem;}
@@ -95,17 +105,28 @@ body{font-family:'DM Sans',sans-serif;background:var(--sidebar);color:#E8E0D8;he
 .hint{font-size:0.63rem;color:var(--text-muted);margin-top:0.24rem;}
 .hidden{display:none!important;}
 
-/* ═══════════════════════════════
-   PREVIEW
-═══════════════════════════════ */
+/* ── PREVIEW PANEL (desktop) ── */
 .preview-panel{background:#C8C3B8;overflow-y:auto;display:flex;flex-direction:column;align-items:center;padding:1.6rem 1rem;}
 .preview-panel::-webkit-scrollbar{width:5px;}
 .preview-panel::-webkit-scrollbar-thumb{background:#AAA398;border-radius:3px;}
 .prev-lbl{font-size:0.63rem;letter-spacing:0.16em;text-transform:uppercase;color:#7A736A;margin-bottom:0.8rem;}
 
-/* ═══════════════════════════════
-   CV DOCUMENT  ← original layout
-═══════════════════════════════ */
+/* ── MOBILE PREVIEW BUTTON (FAB) ── */
+.fab-preview{display:none;position:fixed;bottom:1.4rem;right:1.2rem;z-index:200;background:var(--gold);color:var(--ink);border:none;border-radius:50px;padding:0.75rem 1.3rem;font-family:'DM Sans',sans-serif;font-size:0.83rem;font-weight:600;cursor:pointer;box-shadow:0 4px 24px rgba(0,0,0,0.45);align-items:center;gap:0.45rem;transition:var(--tr);letter-spacing:0.03em;}
+.fab-preview:hover{background:var(--gold-light);transform:translateY(-2px);}
+.fab-preview svg{flex-shrink:0;}
+
+/* ── MOBILE PREVIEW MODAL ── */
+.preview-modal{display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0.85);flex-direction:column;overflow:hidden;}
+.preview-modal.open{display:flex;}
+.preview-modal-bar{background:var(--sidebar);border-bottom:1px solid var(--sidebar-border);padding:0 1rem;height:52px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.preview-modal-bar .brand{font-size:0.95rem;}
+.modal-bar-right{display:flex;gap:0.4rem;}
+.preview-modal-body{flex:1;overflow:auto;background:#B8B3A8;display:flex;justify-content:center;align-items:flex-start;padding:1rem;}
+/* Scale the A4 CV to fit the modal viewport */
+.cv-scale-wrap{transform-origin:top center;/* JS sets scale */}
+
+/* ── CV DOCUMENT ── */
 #cvDoc{background:#fff;width:794px;min-height:1123px;box-shadow:0 4px 40px rgba(0,0,0,0.35);font-family:'Crimson Pro',Georgia,serif;}
 
 .cv-hdr{padding:26px 32px 18px;display:flex;align-items:flex-start;justify-content:space-between;border-bottom:3px solid var(--cv-accent);}
@@ -168,9 +189,35 @@ body{font-family:'DM Sans',sans-serif;background:var(--sidebar);color:#E8E0D8;he
 .cv-sig-lbl{font-size:0.71rem;color:#555;font-family:'DM Sans',sans-serif;}
 .cv-sig-date{font-size:0.69rem;color:#777;font-family:'DM Mono',monospace;margin-bottom:3px;}
 
+/* ════════════════════════════
+   RESPONSIVE BREAKPOINTS
+════════════════════════════ */
+
+/* Tablet & below: stack layout */
+@media (max-width: 900px) {
+  .app{grid-template-columns:1fr;grid-template-rows:1fr;}
+  .preview-panel{display:none;}          /* hidden; use modal */
+  .fab-preview{display:flex;}
+  .hide-xs{display:none;}
+}
+
+/* Narrow phone form tweaks */
+@media (max-width: 500px) {
+  .topbar{padding:0 0.75rem;}
+  .brand{font-size:0.95rem;}
+  .tab-nav{padding:0 22px;}
+  .tab-content{padding:1rem 0.85rem;}
+  .fg-2{grid-template-columns:1fr;}      /* stack pairs */
+  .fg-3{grid-template-columns:1fr 1fr;} /* pairs then solo */
+  .fg-3 .field:last-child:nth-child(odd){grid-column:span 2;}
+  .entry-card{padding:0.7rem;}
+  .fab-preview{bottom:1rem;right:0.85rem;padding:0.65rem 1.1rem;font-size:0.78rem;}
+}
+
+/* ── PRINT ── */
 @media print{
   body,html{background:#fff!important;overflow:visible!important;}
-  .topbar,.form-panel,.prev-lbl{display:none!important;}
+  .topbar,.form-panel,.prev-lbl,.fab-preview,.preview-modal{display:none!important;}
   .app{display:block!important;overflow:visible!important;}
   .preview-panel{display:block!important;padding:0!important;background:#fff!important;overflow:visible!important;}
   #cvDoc{box-shadow:none!important;width:100%!important;}
@@ -182,9 +229,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--sidebar);color:#E8E0D8;he
 <header class="topbar">
   <div class="brand">◈ <span>CV</span>Maker</div>
   <div class="topbar-right">
-    <button class="btn btn-ghost btn-sm" onclick="clearAll()">Clear All</button>
-    <button class="btn btn-ghost btn-sm" onclick="window.print()">🖨 Print</button>
-    <button class="btn btn-gold btn-sm" onclick="downloadPDF()">↓ Download PDF</button>
+    <button class="btn btn-ghost btn-sm hide-xs" onclick="clearAll()">Clear All</button>
+    <button class="btn btn-ghost btn-sm hide-xs" onclick="window.print()">🖨 Print</button>
+    <button class="btn btn-gold btn-sm" onclick="downloadPDF()">↓ PDF</button>
   </div>
 </header>
 
@@ -389,16 +436,23 @@ body{font-family:'DM Sans',sans-serif;background:var(--sidebar);color:#E8E0D8;he
           <label style="display:flex;align-items:center;gap:0.42rem;font-size:0.81rem;cursor:pointer;"><input type="checkbox" id="showRefs" onchange="u()"> References</label>
           <label style="display:flex;align-items:center;gap:0.42rem;font-size:0.81rem;cursor:pointer;"><input type="checkbox" id="showSignature" checked onchange="u()"> Signature</label>
         </div>
+        <div class="divider"></div>
+        <!-- Mobile-only extra actions -->
+        <div class="sec-label">Actions</div>
+        <div style="display:flex;flex-direction:column;gap:0.5rem;">
+          <button class="btn btn-ghost" onclick="window.print()" style="width:100%;justify-content:center;">🖨 Print CV</button>
+          <button class="btn btn-danger" onclick="clearAll()" style="width:100%;text-align:center;padding:0.45rem;">Clear All Data</button>
+        </div>
       </div>
 
     </div>
   </div>
 
-  <!-- PREVIEW PANEL -->
+  <!-- PREVIEW PANEL (desktop) -->
   <div class="preview-panel">
     <div class="prev-lbl">Live Preview — A4</div>
     <div id="cvDoc">
-
+      <!-- CV content rendered here by JS -->
       <div class="cv-hdr">
         <div class="cv-hdr-left">
           <div class="cv-name" id="cvName">YOUR NAME</div>
@@ -411,64 +465,18 @@ body{font-family:'DM Sans',sans-serif;background:var(--sidebar);color:#E8E0D8;he
           <div class="cv-ph-txt" id="cvPhotoPh">Photo</div>
         </div>
       </div>
-
       <div class="cv-body">
-
-        <div class="cv-sec" id="cvPersonalSec">
-          <div class="cv-sec-hdr">Personal Information</div>
-          <table class="cv-info-tbl"><tbody id="cvInfoTbody"></tbody></table>
-        </div>
-
-        <div class="cv-sec hidden" id="cvObjSec">
-          <div class="cv-sec-hdr">Objective</div>
-          <div class="cv-obj" id="cvObjText"></div>
-        </div>
-
-        <div class="cv-sec" id="cvEduSec">
-          <div class="cv-sec-hdr">Educational Qualification</div>
-          <table class="cv-edu-tbl">
-            <thead><tr><th>Degree / Exam</th><th>Major / Subject</th><th>Board / Institution</th><th>Year</th><th>GPA / Marks</th><th>Result</th></tr></thead>
-            <tbody id="cvEduTbody"></tbody>
-          </table>
-        </div>
-
-        <div class="cv-sec hidden" id="cvExpSec">
-          <div class="cv-sec-hdr">Work Experience</div>
-          <div id="cvExpList"></div>
-        </div>
-
-        <div class="cv-sec hidden" id="cvSkillsSec">
-          <div class="cv-sec-hdr">Skills</div>
-          <div class="cv-list-cols" id="cvSkillsList"></div>
-        </div>
-
-        <div class="cv-sec hidden" id="cvLangsSec">
-          <div class="cv-sec-hdr">Languages</div>
-          <div class="cv-list-cols" id="cvLangsList"></div>
-        </div>
-
-        <div class="cv-sec hidden" id="cvHobbiesSec">
-          <div class="cv-sec-hdr">Hobbies &amp; Interests</div>
-          <div class="cv-list-cols" id="cvHobbiesList"></div>
-        </div>
-
-        <div class="cv-sec hidden" id="cvCertsSec">
-          <div class="cv-sec-hdr">Certifications</div>
-          <div id="cvCertsList"></div>
-        </div>
-
-        <div class="cv-sec hidden" id="cvAwardsSec">
-          <div class="cv-sec-hdr">Awards &amp; Achievements</div>
-          <div id="cvAwardsList"></div>
-        </div>
-
+        <div class="cv-sec" id="cvPersonalSec"><div class="cv-sec-hdr">Personal Information</div><table class="cv-info-tbl"><tbody id="cvInfoTbody"></tbody></table></div>
+        <div class="cv-sec hidden" id="cvObjSec"><div class="cv-sec-hdr">Objective</div><div class="cv-obj" id="cvObjText"></div></div>
+        <div class="cv-sec" id="cvEduSec"><div class="cv-sec-hdr">Educational Qualification</div><table class="cv-edu-tbl"><thead><tr><th>Degree / Exam</th><th>Major / Subject</th><th>Board / Institution</th><th>Year</th><th>GPA / Marks</th><th>Result</th></tr></thead><tbody id="cvEduTbody"></tbody></table></div>
+        <div class="cv-sec hidden" id="cvExpSec"><div class="cv-sec-hdr">Work Experience</div><div id="cvExpList"></div></div>
+        <div class="cv-sec hidden" id="cvSkillsSec"><div class="cv-sec-hdr">Skills</div><div class="cv-list-cols" id="cvSkillsList"></div></div>
+        <div class="cv-sec hidden" id="cvLangsSec"><div class="cv-sec-hdr">Languages</div><div class="cv-list-cols" id="cvLangsList"></div></div>
+        <div class="cv-sec hidden" id="cvHobbiesSec"><div class="cv-sec-hdr">Hobbies &amp; Interests</div><div class="cv-list-cols" id="cvHobbiesList"></div></div>
+        <div class="cv-sec hidden" id="cvCertsSec"><div class="cv-sec-hdr">Certifications</div><div id="cvCertsList"></div></div>
+        <div class="cv-sec hidden" id="cvAwardsSec"><div class="cv-sec-hdr">Awards &amp; Achievements</div><div id="cvAwardsList"></div></div>
         <div id="cvCustomSecs"></div>
-
-        <div class="cv-sec hidden" id="cvRefsSec">
-          <div class="cv-sec-hdr">References</div>
-          <div class="cv-refs-grid" id="cvRefsList"></div>
-        </div>
-
+        <div class="cv-sec hidden" id="cvRefsSec"><div class="cv-sec-hdr">References</div><div class="cv-refs-grid" id="cvRefsList"></div></div>
         <div class="cv-sig-wrap hidden" id="cvSigWrap">
           <div class="cv-sig-block" id="cvDateBlock" style="display:none;text-align:center;">
             <div class="cv-sig-date hidden" id="cvSigDateTxt"></div>
@@ -481,14 +489,37 @@ body{font-family:'DM Sans',sans-serif;background:var(--sidebar);color:#E8E0D8;he
             <div class="cv-sig-lbl" id="cvSigLbl">Signature</div>
           </div>
         </div>
-
       </div>
     </div>
   </div>
 </div>
 
+<!-- ── FLOATING PREVIEW BUTTON (mobile only) ── -->
+<button class="fab-preview" onclick="openPreviewModal()">
+  <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12S5 4 12 4s11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+  Preview CV
+</button>
+
+<!-- ── MOBILE PREVIEW MODAL ── -->
+<div class="preview-modal" id="previewModal">
+  <div class="preview-modal-bar">
+    <div class="brand">◈ <span>CV</span> Preview</div>
+    <div class="modal-bar-right">
+      <button class="btn btn-gold btn-sm" onclick="downloadPDF()">↓ PDF</button>
+      <button class="btn btn-ghost btn-sm" onclick="closePreviewModal()">✕ Close</button>
+    </div>
+  </div>
+  <div class="preview-modal-body" id="previewModalBody">
+    <div class="cv-scale-wrap" id="cvScaleWrap">
+      <!-- cloned CV rendered here -->
+    </div>
+  </div>
+</div>
+
 <script>
+// ══════════════════════════════════════
 // STATE
+// ══════════════════════════════════════
 const S={photo:null,sig:null,skills:[],langs:[],hobbies:[],edu:[],exp:[],certs:[],awards:[],refs:[],custSecs:[]};
 const C={edu:0,exp:0,cert:0,award:0,ref:0,cs:0,ci:0};
 
@@ -497,9 +528,56 @@ window.addEventListener('DOMContentLoaded',()=>{
   if(!S.edu.length) addEdu();
   if(!S.exp.length) addExp();
   u();
+  setupModalScale();
 });
 
+window.addEventListener('resize', setupModalScale);
+
+// ══════════════════════════════════════
+// MOBILE PREVIEW MODAL
+// ══════════════════════════════════════
+function openPreviewModal(){
+  const modal = document.getElementById('previewModal');
+  const wrap  = document.getElementById('cvScaleWrap');
+  // Clone the live CV into the modal
+  const original = document.getElementById('cvDoc');
+  const clone    = original.cloneNode(true);
+  clone.id = 'cvDocClone';
+  wrap.innerHTML = '';
+  wrap.appendChild(clone);
+  modal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  setupModalScale();
+}
+
+function closePreviewModal(){
+  document.getElementById('previewModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function setupModalScale(){
+  // Scale the 794px CV to fit the modal body width with padding
+  const body  = document.getElementById('previewModalBody');
+  const wrap  = document.getElementById('cvScaleWrap');
+  if (!body || !wrap) return;
+  const availableW = body.clientWidth - 24; // 12px each side
+  const cvW = 794;
+  const scale = Math.min(1, availableW / cvW);
+  wrap.style.transform = `scale(${scale})`;
+  // Shrink the wrapper height so scroll works correctly
+  wrap.style.height = (1123 * scale) + 'px';      // A4 height * scale
+  wrap.style.width  = (cvW  * scale) + 'px';
+  wrap.style.overflow = 'hidden';
+}
+
+// Close modal on backdrop click
+document.getElementById('previewModal').addEventListener('click', function(e){
+  if(e.target === this || e.target === document.getElementById('previewModalBody')) closePreviewModal();
+});
+
+// ══════════════════════════════════════
 // TABS
+// ══════════════════════════════════════
 function sw(name,btn){
   document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
@@ -508,7 +586,9 @@ function sw(name,btn){
 }
 function slideTabs(dx){ document.getElementById('tabNav').scrollBy({left:dx,behavior:'smooth'}); }
 
+// ══════════════════════════════════════
 // HELPERS
+// ══════════════════════════════════════
 const $=id=>document.getElementById(id);
 const gv=id=>$(id)?.value||'';
 const chk=id=>$(id)?.checked??true;
@@ -517,15 +597,21 @@ const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'
 const fmtD=s=>{if(!s)return'';const d=new Date(s+'T00:00:00');return d.toLocaleDateString('en-GB',{day:'2-digit',month:'2-digit',year:'numeric'});};
 const fmtM=s=>{if(!s)return'';const[y,m]=s.split('-');return['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][+m-1]+' '+y;};
 
+// ══════════════════════════════════════
 // PHOTO
+// ══════════════════════════════════════
 function loadPhoto(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{S.photo=ev.target.result;$('photoPreview').src=S.photo;$('photoPreview').style.display='block';$('photoPh').style.display='none';$('removePhotoBtn').style.display='inline-block';$('cvPhotoImg').src=S.photo;$('cvPhotoImg').style.display='block';$('cvPhotoPh').style.display='none';};r.readAsDataURL(f);}
 function removePhoto(){S.photo=null;$('photoPreview').style.display='none';$('photoPh').style.display='flex';$('removePhotoBtn').style.display='none';$('cvPhotoImg').style.display='none';$('cvPhotoPh').style.display='block';$('photoInput').value='';}
 
+// ══════════════════════════════════════
 // SIGNATURE
+// ══════════════════════════════════════
 function loadSig(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{S.sig=ev.target.result;$('sigPreview').src=S.sig;$('sigPreview').style.display='block';$('sigPh').style.display='none';$('removeSigBtn').style.display='inline-block';u();};r.readAsDataURL(f);}
 function removeSig(){S.sig=null;$('sigPreview').style.display='none';$('sigPh').style.display='flex';$('removeSigBtn').style.display='none';$('sigInput').value='';u();}
 
+// ══════════════════════════════════════
 // TAGS
+// ══════════════════════════════════════
 function handleTag(e,key){
   const imap={skills:'skillInp',langs:'langInp',hobbies:'hobbyInp'};
   const wmap={skills:'skillsWrap',langs:'langsWrap',hobbies:'hobbiesWrap'};
@@ -535,7 +621,9 @@ function handleTag(e,key){
 }
 function rmTag(el){const t=el.parentElement;S[t.dataset.key]=S[t.dataset.key].filter(v=>v!==t.dataset.val);t.remove();u();}
 
+// ══════════════════════════════════════
 // EDUCATION
+// ══════════════════════════════════════
 function addEdu(){
   const id=C.edu++;S.edu.push({id,degree:'',major:'',board:'',year:'',gpa:'',result:''});
   const d=document.createElement('div');d.className='entry-card';d.id='edu-'+id;
@@ -558,7 +646,9 @@ function addEdu(){
 function syncEdu(id){const e=S.edu.find(x=>x.id===id);if(!e)return;e.degree=gv('ed-dg-'+id);e.major=gv('ed-mj-'+id);e.board=gv('ed-bd-'+id);e.year=gv('ed-yr-'+id);e.gpa=gv('ed-gp-'+id);e.result=gv('ed-rs-'+id);u();}
 function rmEdu(id){S.edu=S.edu.filter(x=>x.id!==id);$('edu-'+id)?.remove();u();}
 
+// ══════════════════════════════════════
 // EXPERIENCE
+// ══════════════════════════════════════
 function addExp(){
   const id=C.exp++;S.exp.push({id,title:'',company:'',location:'',from:'',to:'',current:false,desc:'',bullets:''});
   const d=document.createElement('div');d.className='entry-card';d.id='exp-'+id;
@@ -587,7 +677,9 @@ function toggleCur(id){const el=$('ex-to-'+id);if(el){el.disabled=$('ex-cur-'+id
 function syncExp(id){const e=S.exp.find(x=>x.id===id);if(!e)return;e.title=gv('ex-tt-'+id);e.company=gv('ex-co-'+id);e.location=gv('ex-lc-'+id);e.from=gv('ex-fr-'+id);e.to=gv('ex-to-'+id);e.current=$('ex-cur-'+id)?.checked||false;e.desc=gv('ex-ds-'+id);e.bullets=gv('ex-bl-'+id);u();}
 function rmExp(id){S.exp=S.exp.filter(x=>x.id!==id);$('exp-'+id)?.remove();u();}
 
-// CERTS
+// ══════════════════════════════════════
+// CERTIFICATIONS
+// ══════════════════════════════════════
 function addCert(){
   const id=C.cert++;S.certs.push({id,name:'',issuer:'',year:''});
   const d=document.createElement('div');d.className='entry-card';d.id='cert-'+id;
@@ -599,7 +691,9 @@ function addCert(){
 function syncCert(id){const c=S.certs.find(x=>x.id===id);if(!c)return;c.name=gv('ct-nm-'+id);c.issuer=gv('ct-is-'+id);c.year=gv('ct-yr-'+id);u();}
 function rmCert(id){S.certs=S.certs.filter(x=>x.id!==id);$('cert-'+id)?.remove();u();}
 
+// ══════════════════════════════════════
 // AWARDS
+// ══════════════════════════════════════
 function addAward(){
   const id=C.award++;S.awards.push({id,title:'',org:'',year:'',desc:''});
   const d=document.createElement('div');d.className='entry-card';d.id='award-'+id;
@@ -611,7 +705,9 @@ function addAward(){
 function syncAward(id){const a=S.awards.find(x=>x.id===id);if(!a)return;a.title=gv('aw-tt-'+id);a.org=gv('aw-og-'+id);a.year=gv('aw-yr-'+id);a.desc=gv('aw-ds-'+id);u();}
 function rmAward(id){S.awards=S.awards.filter(x=>x.id!==id);$('award-'+id)?.remove();u();}
 
+// ══════════════════════════════════════
 // REFERENCES
+// ══════════════════════════════════════
 function addRef(){
   const id=C.ref++;S.refs.push({id,name:'',title:'',org:'',phone:'',email:'',rel:''});
   const d=document.createElement('div');d.className='entry-card';d.id='ref-'+id;
@@ -625,7 +721,9 @@ function addRef(){
 function syncRef(id){const r=S.refs.find(x=>x.id===id);if(!r)return;r.name=gv('rf-nm-'+id);r.title=gv('rf-tt-'+id);r.org=gv('rf-og-'+id);r.phone=gv('rf-ph-'+id);r.email=gv('rf-em-'+id);r.rel=gv('rf-rl-'+id);u();}
 function rmRef(id){S.refs=S.refs.filter(x=>x.id!==id);$('ref-'+id)?.remove();u();}
 
+// ══════════════════════════════════════
 // CUSTOM SECTIONS
+// ══════════════════════════════════════
 function addCustSec(){
   const id=C.cs++;S.custSecs.push({id,title:'',items:[]});
   const d=document.createElement('div');d.className='entry-card';d.id='cs-'+id;d.style.borderColor='var(--gold-dim)';
@@ -650,7 +748,9 @@ function addCustItem(sid){
 function syncCustItem(sid,iid){const sec=S.custSecs.find(x=>x.id===sid);if(!sec)return;const it=sec.items.find(x=>x.id===iid);if(!it)return;it.title=gv('cit-'+iid);it.sub=gv('cis-'+iid);it.period=gv('cip-'+iid);it.desc=gv('cid-'+iid);u();}
 function rmCustItem(sid,iid){const sec=S.custSecs.find(x=>x.id===sid);if(!sec)return;sec.items=sec.items.filter(x=>x.id!==iid);$('ci-'+iid)?.remove();u();}
 
+// ══════════════════════════════════════
 // THEME
+// ══════════════════════════════════════
 function applyTheme(){
   const cv=$('cvDoc');
   cv.style.setProperty('--cv-accent',gv('accentColor'));
@@ -658,7 +758,9 @@ function applyTheme(){
   cv.style.fontFamily=gv('bodyFont');
 }
 
+// ══════════════════════════════════════
 // MAIN RENDER
+// ══════════════════════════════════════
 function u(){
   saveSession();
 
@@ -771,7 +873,9 @@ function u(){
   }
 }
 
+// ══════════════════════════════════════
 // SESSION
+// ══════════════════════════════════════
 function saveSession(){
   try{
     const fids=['nameEn','nameBn','tagline','fatherName','motherName','spouseName','dob','pob','nationality','maritalStatus','religion','gender','bloodGroup','height','weight','nid','passport','passportIssue','passportExpiry','phone','phone2','email','addressPresent','addressPermanent','linkedin','website','github','twitter','objective','sigName','sigDate'];
@@ -800,10 +904,27 @@ function loadSession(){
   }catch(e){console.warn('load err',e);}
 }
 
-// PDF
-function downloadPDF(){const el=$('cvDoc');const name=gv('nameEn')||'CV';const btn=event.currentTarget;btn.textContent='Generating…';btn.disabled=true;html2pdf().set({margin:0,filename:name.replace(/\s+/g,'_')+'_CV.pdf',image:{type:'jpeg',quality:0.98},html2canvas:{scale:2,useCORS:true},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}}).from(el).save().then(()=>{btn.textContent='↓ Download PDF';btn.disabled=false;});}
+// ══════════════════════════════════════
+// PDF DOWNLOAD
+// ══════════════════════════════════════
+function downloadPDF(){
+  const el=$('cvDoc');
+  const name=gv('nameEn')||'CV';
+  const btn=document.querySelector('.btn-gold');
+  const origText=btn.textContent;
+  btn.textContent='…';btn.disabled=true;
+  html2pdf().set({
+    margin:0,
+    filename:name.replace(/\s+/g,'_')+'_CV.pdf',
+    image:{type:'jpeg',quality:0.98},
+    html2canvas:{scale:2,useCORS:true},
+    jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}
+  }).from(el).save().then(()=>{btn.textContent=origText;btn.disabled=false;});
+}
 
-// CLEAR
+// ══════════════════════════════════════
+// CLEAR ALL
+// ══════════════════════════════════════
 function clearAll(){if(!confirm('Clear everything?'))return;localStorage.removeItem('cvmk4');location.reload();}
 
 u();
