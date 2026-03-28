@@ -3,42 +3,765 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Terminal</title>
-<link rel="stylesheet" href="styles/style.css">
+<title>CV Maker — Professional Resume Builder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300&family=DM+Sans:wght@300;400;500&family=DM+Mono&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<style>
+:root {
+  --gold: #B8923A;
+  --gold-light: #D4AC5A;
+  --gold-dim: #8A6B2A;
+  --ink: #1A1814;
+  --sidebar: #171412;
+  --sidebar-card: #201D1A;
+  --sidebar-border: #2E2A26;
+  --text-muted: #7A7068;
+  --cv-accent: #2C3E50;
+  --cv-gray: #F5F5F5;
+  --cv-line: #BDBDBD;
+  --radius: 6px;
+  --transition: 0.18s ease;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; background: var(--sidebar); color: #E8E0D8; min-height: 100vh; display: flex; flex-direction: column; }
+
+/* TOP BAR */
+.topbar { background: var(--sidebar); border-bottom: 1px solid var(--sidebar-border); padding: 0 2rem; height: 56px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+.topbar-brand { font-family: 'Playfair Display', serif; font-size: 1.2rem; color: var(--gold); letter-spacing: 0.04em; }
+.topbar-brand span { color: #E8E0D8; font-weight: 400; }
+.topbar-actions { display: flex; gap: 0.75rem; align-items: center; }
+.btn { font-family: 'DM Sans', sans-serif; font-size: 0.82rem; font-weight: 500; padding: 0.45rem 1.1rem; border-radius: var(--radius); cursor: pointer; border: none; transition: var(--transition); letter-spacing: 0.03em; }
+.btn-gold { background: var(--gold); color: var(--ink); }
+.btn-gold:hover { background: var(--gold-light); }
+.btn-ghost { background: transparent; color: #B0A898; border: 1px solid var(--sidebar-border); }
+.btn-ghost:hover { border-color: var(--gold-dim); color: var(--gold-light); }
+.btn-danger { background: transparent; color: #c0392b; border: 1px solid #5a1a1a; font-size: 0.75rem; padding: 0.3rem 0.75rem; font-family: 'DM Sans', sans-serif; cursor: pointer; border-radius: var(--radius); }
+.btn-danger:hover { background: #3a0a0a; }
+
+/* LAYOUT */
+.app-layout { display: grid; grid-template-columns: 430px 1fr; flex: 1; overflow: hidden; height: calc(100vh - 56px); }
+
+/* FORM PANEL */
+.form-panel { background: var(--sidebar); border-right: 1px solid var(--sidebar-border); overflow-y: auto; display: flex; flex-direction: column; }
+.form-panel::-webkit-scrollbar { width: 4px; }
+.form-panel::-webkit-scrollbar-thumb { background: var(--sidebar-border); border-radius: 2px; }
+
+/* TABS */
+.tab-nav { display: flex; background: var(--sidebar-card); border-bottom: 1px solid var(--sidebar-border); overflow-x: auto; scrollbar-width: none; flex-shrink: 0; }
+.tab-nav::-webkit-scrollbar { display: none; }
+.tab-btn { padding: 0.75rem 1rem; font-size: 0.73rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); background: none; border: none; cursor: pointer; white-space: nowrap; border-bottom: 2px solid transparent; transition: var(--transition); font-family: 'DM Sans', sans-serif; }
+.tab-btn:hover { color: #C8BEB4; }
+.tab-btn.active { color: var(--gold); border-bottom-color: var(--gold); }
+.tab-content { display: none; padding: 1.5rem; flex: 1; }
+.tab-content.active { display: block; }
+.form-section-label { font-family: 'Playfair Display', serif; font-size: 0.95rem; color: var(--gold-light); margin-bottom: 1rem; padding-bottom: 0.4rem; border-bottom: 1px solid var(--sidebar-border); letter-spacing: 0.02em; }
+
+/* FIELDS */
+.field-group { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem; }
+.field-group.full { grid-template-columns: 1fr; }
+.field-group.triple { grid-template-columns: 1fr 1fr 1fr; }
+.field { display: flex; flex-direction: column; gap: 0.3rem; }
+.field label { font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); font-weight: 500; }
+.field input, .field select, .field textarea { background: var(--sidebar-card); border: 1px solid var(--sidebar-border); border-radius: var(--radius); color: #E8E0D8; font-family: 'DM Sans', sans-serif; font-size: 0.87rem; padding: 0.5rem 0.7rem; outline: none; transition: var(--transition); width: 100%; }
+.field input:focus, .field select:focus, .field textarea:focus { border-color: var(--gold-dim); box-shadow: 0 0 0 2px rgba(184,146,58,0.12); }
+.field input::placeholder { color: #4A4540; }
+.field select option { background: #201D1A; }
+.field textarea { resize: vertical; min-height: 70px; }
+
+/* PHOTO */
+.photo-upload-area { display: flex; flex-direction: column; align-items: center; gap: 0.75rem; margin-bottom: 1.2rem; }
+.photo-circle { width: 90px; height: 90px; border-radius: 50%; border: 2px solid var(--sidebar-border); background: var(--sidebar-card); overflow: hidden; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--transition); }
+.photo-circle:hover { border-color: var(--gold-dim); }
+.photo-circle img { width: 100%; height: 100%; object-fit: cover; display: none; }
+.photo-placeholder { display: flex; flex-direction: column; align-items: center; color: var(--text-muted); font-size: 0.7rem; gap: 0.3rem; }
+#photoInput { display: none; }
+
+/* ENTRY CARDS */
+.entry-card { background: var(--sidebar-card); border: 1px solid var(--sidebar-border); border-radius: var(--radius); padding: 1rem; margin-bottom: 0.75rem; }
+.entry-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; }
+.entry-card-title { font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold-dim); font-weight: 500; }
+.add-entry-btn { display: flex; align-items: center; gap: 0.4rem; font-size: 0.78rem; color: var(--gold); background: none; border: 1px dashed var(--gold-dim); border-radius: var(--radius); padding: 0.5rem 1rem; cursor: pointer; font-family: 'DM Sans', sans-serif; width: 100%; justify-content: center; transition: var(--transition); margin-top: 0.5rem; }
+.add-entry-btn:hover { background: rgba(184,146,58,0.08); }
+
+/* TAGS */
+.tag-input-wrapper { background: var(--sidebar-card); border: 1px solid var(--sidebar-border); border-radius: var(--radius); padding: 0.5rem; display: flex; flex-wrap: wrap; gap: 0.4rem; cursor: text; transition: var(--transition); min-height: 44px; }
+.tag-input-wrapper:focus-within { border-color: var(--gold-dim); box-shadow: 0 0 0 2px rgba(184,146,58,0.12); }
+.tag { background: rgba(184,146,58,0.15); color: var(--gold-light); border: 1px solid rgba(184,146,58,0.3); border-radius: 3px; padding: 0.2rem 0.5rem; font-size: 0.78rem; display: flex; align-items: center; gap: 0.3rem; }
+.tag-remove { cursor: pointer; opacity: 0.6; font-size: 0.9rem; line-height: 1; }
+.tag-remove:hover { opacity: 1; }
+.tag-text-input { background: none; border: none; outline: none; color: #E8E0D8; font-family: 'DM Sans', sans-serif; font-size: 0.85rem; min-width: 120px; flex: 1; }
+.tag-hint { font-size: 0.68rem; color: var(--text-muted); margin-top: 0.3rem; }
+
+.separator { height: 1px; background: var(--sidebar-border); margin: 1rem 0; }
+.hidden { display: none !important; }
+
+/* PREVIEW PANEL */
+.preview-panel { background: #C8C3B8; overflow-y: auto; display: flex; flex-direction: column; align-items: center; padding: 2rem 1.5rem; }
+.preview-panel::-webkit-scrollbar { width: 6px; }
+.preview-panel::-webkit-scrollbar-thumb { background: #AAA398; border-radius: 3px; }
+.preview-label { font-size: 0.68rem; letter-spacing: 0.15em; text-transform: uppercase; color: #7A736A; margin-bottom: 1rem; font-weight: 500; }
+
+/* CV DOCUMENT */
+#cvDocument { background: #fff; width: 794px; min-height: 1123px; box-shadow: 0 4px 40px rgba(0,0,0,0.35); font-family: 'Crimson Pro', Georgia, serif; }
+
+.cv-header { padding: 26px 32px 18px; display: flex; align-items: flex-start; justify-content: space-between; border-bottom: 3px solid var(--cv-accent); }
+.cv-header-left { flex: 1; }
+.cv-name { font-family: 'Playfair Display', serif; font-size: 2.1rem; font-weight: 700; color: var(--cv-accent); letter-spacing: 0.04em; text-transform: uppercase; line-height: 1; margin-bottom: 3px; }
+.cv-name-bn { font-size: 1rem; color: #666; font-weight: 300; margin-bottom: 10px; }
+.cv-contact-row { display: flex; flex-wrap: wrap; gap: 3px 18px; margin-top: 8px; }
+.cv-contact-item { font-size: 0.8rem; color: #444; display: flex; align-items: center; gap: 4px; }
+.cv-contact-item strong { color: var(--cv-accent); font-weight: 600; }
+.cv-photo-box { width: 110px; height: 130px; border: 2px solid var(--cv-accent); overflow: hidden; flex-shrink: 0; margin-left: 20px; background: #eee; display: flex; align-items: center; justify-content: center; }
+.cv-photo-box img { width: 100%; height: 100%; object-fit: cover; }
+.cv-photo-placeholder { color: #bbb; font-size: 0.7rem; text-align: center; font-family: 'DM Sans', sans-serif; }
+
+.cv-body { padding: 0 32px 32px; }
+.cv-section { margin-top: 16px; }
+.cv-section-header { background: var(--cv-gray); border-left: 4px solid var(--cv-accent); padding: 4px 10px; font-family: 'DM Sans', sans-serif; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--cv-accent); margin-bottom: 10px; }
+
+.cv-info-table { width: 100%; border-collapse: collapse; font-size: 0.87rem; }
+.cv-info-table td { padding: 3px 6px; color: #333; vertical-align: top; }
+.cv-info-table td:first-child { width: 145px; color: #555; }
+.cv-info-table td:nth-child(2) { width: 14px; color: #aaa; text-align: center; }
+.cv-info-table td:last-child { font-weight: 300; }
+
+.cv-objective { font-size: 0.87rem; color: #333; line-height: 1.7; font-weight: 300; text-align: justify; }
+
+.cv-edu-table { width: 100%; border-collapse: collapse; font-size: 0.83rem; }
+.cv-edu-table th { background: var(--cv-accent); color: #fff; padding: 6px 10px; text-align: center; font-family: 'DM Sans', sans-serif; font-size: 0.72rem; font-weight: 500; letter-spacing: 0.03em; }
+.cv-edu-table td { padding: 5px 10px; text-align: center; color: #333; border: 1px solid #DDD; }
+.cv-edu-table tr:nth-child(even) td { background: #FAFAFA; }
+
+.cv-exp-item { margin-bottom: 12px; }
+.cv-exp-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 2px; }
+.cv-exp-title { font-size: 0.9rem; font-weight: 600; color: var(--cv-accent); }
+.cv-exp-period { font-size: 0.76rem; color: #888; font-family: 'DM Mono', monospace; }
+.cv-exp-company { font-size: 0.82rem; color: #555; font-style: italic; margin-bottom: 3px; }
+.cv-exp-desc { font-size: 0.83rem; color: #444; line-height: 1.6; font-weight: 300; }
+
+.cv-list-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 20px; }
+.cv-list-item { display: flex; align-items: center; gap: 8px; font-size: 0.86rem; color: #333; padding: 2px 0; font-weight: 300; }
+.cv-list-item::before { content: ''; width: 5px; height: 5px; border: 1.5px solid var(--cv-accent); border-radius: 50%; flex-shrink: 0; }
+
+.cv-signature-section { margin-top: 30px; display: flex; justify-content: flex-end; }
+.cv-signature-box { text-align: center; }
+.cv-signature-line { width: 160px; border-bottom: 1px solid #555; margin-bottom: 4px; }
+.cv-signature-label { font-size: 0.74rem; color: #555; font-family: 'DM Sans', sans-serif; }
+
+@media print {
+  body { background: white !important; }
+  .topbar, .form-panel, .preview-label { display: none !important; }
+  .app-layout { display: block !important; height: auto !important; }
+  .preview-panel { display: block !important; padding: 0 !important; background: white !important; overflow: visible !important; }
+  #cvDocument { box-shadow: none !important; width: 100% !important; }
+}
+</style>
 </head>
-
-
 <body>
 
-<div class="container">
-  <!-- Terminal -->
-  <div class="Terminal" id="terminal">
-    <div class="Terminal__Toolbar">
-      <div class="Toolbar__buttons">
-        <button class="Toolbar__button Toolbar__button--exit" onclick="toggleTerminal()">❌</button>
-        <button class="Toolbar__button">&#9472;</button>
-        <button class="Toolbar__button">&#9723;</button>
-      </div>
-      <p class="Toolbar__user">Imran@Ifty:~</p>
+<header class="topbar">
+  <div class="topbar-brand">◈ <span>CV</span>Maker</div>
+  <div class="topbar-actions">
+    <button class="btn btn-ghost" onclick="clearAll()">Clear All</button>
+    <button class="btn btn-ghost" onclick="window.print()">🖨 Print</button>
+    <button class="btn btn-gold" onclick="downloadPDF()">↓ Download PDF</button>
+  </div>
+</header>
+
+<div class="app-layout">
+
+  <!-- FORM PANEL -->
+  <div class="form-panel">
+    <div class="tab-nav">
+      <button class="tab-btn active" onclick="switchTab('personal',this)">Personal</button>
+      <button class="tab-btn" onclick="switchTab('education',this)">Education</button>
+      <button class="tab-btn" onclick="switchTab('experience',this)">Experience</button>
+      <button class="tab-btn" onclick="switchTab('skills',this)">Skills</button>
+      <button class="tab-btn" onclick="switchTab('objective',this)">Objective</button>
+      <button class="tab-btn" onclick="switchTab('settings',this)">Settings</button>
     </div>
-    <div class="Terminal__body">
-      <div class="Terminal__text">Welcome to Imran's Terminal</div>
-      <div class="Terminal__Prompt">
-        <span class="Prompt__user">Imran@Ifty:</span><span class="Prompt__location">~</span><span class="Prompt__dollar">$</span>
-        <input class="Prompt__input" type="text">
-        <span class="Prompt__cursor"></span>
+
+    <!-- TAB: PERSONAL -->
+    <div id="tab-personal" class="tab-content active">
+      <div class="form-section-label">Photo</div>
+      <div class="photo-upload-area">
+        <div class="photo-circle" onclick="document.getElementById('photoInput').click()">
+          <img id="photoPreview" src="" alt="">
+          <div class="photo-placeholder" id="photoPlaceholder">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.58-7 8-7s8 3 8 7"/></svg>
+            <span>Add Photo</span>
+          </div>
+        </div>
+        <input type="file" id="photoInput" accept="image/*" onchange="loadPhoto(event)">
+        <button class="btn btn-danger" id="removePhotoBtn" style="display:none" onclick="removePhoto()">Remove Photo</button>
+      </div>
+
+      <div class="form-section-label">Identity</div>
+      <div class="field-group full"><div class="field"><label>Full Name (English)</label><input type="text" id="nameEn" placeholder="e.g. Eliana Rahman" oninput="update()" list="dl-nameEn"><datalist id="dl-nameEn"></datalist></div></div>
+      <div class="field-group full"><div class="field"><label>Full Name (বাংলা)</label><input type="text" id="nameBn" placeholder="বাংলায় নাম লিখুন" oninput="update()" list="dl-nameBn"><datalist id="dl-nameBn"></datalist></div></div>
+      <div class="field-group">
+        <div class="field"><label>Father's Name</label><input type="text" id="fatherName" placeholder="Father's full name" oninput="update()" list="dl-fatherName"><datalist id="dl-fatherName"></datalist></div>
+        <div class="field"><label>Mother's Name</label><input type="text" id="motherName" placeholder="Mother's full name" oninput="update()" list="dl-motherName"><datalist id="dl-motherName"></datalist></div>
+      </div>
+      <div class="field-group">
+        <div class="field"><label>Date of Birth</label><input type="date" id="dob" oninput="update()"></div>
+        <div class="field"><label>Nationality</label><input type="text" id="nationality" placeholder="e.g. Bangladeshi" oninput="update()" list="dl-nationality"><datalist id="dl-nationality"></datalist></div>
+      </div>
+      <div class="field-group">
+        <div class="field"><label>Marital Status</label><select id="maritalStatus" onchange="update()"><option value="">— Select —</option><option>Single</option><option>Married</option><option>Divorced</option><option>Widowed</option></select></div>
+        <div class="field"><label>Religion</label><input type="text" id="religion" placeholder="e.g. Islam" oninput="update()" list="dl-religion"><datalist id="dl-religion"></datalist></div>
+      </div>
+      <div class="field-group">
+        <div class="field"><label>Blood Group</label><select id="bloodGroup" onchange="update()"><option value="">— Select —</option><option>A+</option><option>A−</option><option>B+</option><option>B−</option><option>AB+</option><option>AB−</option><option>O+</option><option>O−</option></select></div>
+        <div class="field"><label>NID / Passport No.</label><input type="text" id="nid" placeholder="ID number" oninput="update()"></div>
+      </div>
+
+      <div class="separator"></div>
+      <div class="form-section-label">Contact</div>
+      <div class="field-group">
+        <div class="field"><label>Phone</label><input type="tel" id="phone" placeholder="+880 1X XX XXXXXX" oninput="update()" list="dl-phone"><datalist id="dl-phone"></datalist></div>
+        <div class="field"><label>Email</label><input type="email" id="email" placeholder="you@email.com" oninput="update()" list="dl-email"><datalist id="dl-email"></datalist></div>
+      </div>
+      <div class="field-group full"><div class="field"><label>Present Address</label><input type="text" id="addressPresent" placeholder="Street, City, District" oninput="update()" list="dl-address"><datalist id="dl-address"></datalist></div></div>
+      <div class="field-group full"><div class="field"><label>Permanent Address</label><input type="text" id="addressPermanent" placeholder="If different from above" oninput="update()"></div></div>
+      <div class="field-group">
+        <div class="field"><label>LinkedIn (optional)</label><input type="text" id="linkedin" placeholder="linkedin.com/in/..." oninput="update()"></div>
+        <div class="field"><label>Website (optional)</label><input type="text" id="website" placeholder="yourwebsite.com" oninput="update()"></div>
+      </div>
+    </div>
+
+    <!-- TAB: EDUCATION -->
+    <div id="tab-education" class="tab-content">
+      <div class="form-section-label">Academic Qualifications</div>
+      <div id="educationEntries"></div>
+      <button class="add-entry-btn" onclick="addEducation()">＋ Add Qualification</button>
+    </div>
+
+    <!-- TAB: EXPERIENCE -->
+    <div id="tab-experience" class="tab-content">
+      <div class="form-section-label">Work Experience</div>
+      <div id="experienceEntries"></div>
+      <button class="add-entry-btn" onclick="addExperience()">＋ Add Experience</button>
+    </div>
+
+    <!-- TAB: SKILLS -->
+    <div id="tab-skills" class="tab-content">
+      <div class="form-section-label">Skills</div>
+      <div class="tag-input-wrapper" id="skillsWrapper" onclick="document.getElementById('skillInput').focus()">
+        <input class="tag-text-input" id="skillInput" placeholder="Type a skill, press Enter…" onkeydown="handleTag(event,'skills')">
+      </div>
+      <div class="tag-hint">Press Enter or comma to add · Click × to remove</div>
+
+      <div class="separator"></div>
+      <div class="form-section-label">Languages</div>
+      <div class="tag-input-wrapper" id="languagesWrapper" onclick="document.getElementById('langInput').focus()">
+        <input class="tag-text-input" id="langInput" placeholder="e.g. English, Bengali…" onkeydown="handleTag(event,'languages')">
+      </div>
+      <div class="tag-hint">Press Enter or comma to add</div>
+
+      <div class="separator"></div>
+      <div class="form-section-label">Hobbies &amp; Interests</div>
+      <div class="tag-input-wrapper" id="hobbiesWrapper" onclick="document.getElementById('hobbyInput').focus()">
+        <input class="tag-text-input" id="hobbyInput" placeholder="e.g. Reading, Photography…" onkeydown="handleTag(event,'hobbies')">
+      </div>
+      <div class="tag-hint">Press Enter or comma to add</div>
+    </div>
+
+    <!-- TAB: OBJECTIVE -->
+    <div id="tab-objective" class="tab-content">
+      <div class="form-section-label">Career Objective / Summary</div>
+      <div class="field full">
+        <label>Write your objective</label>
+        <textarea id="objective" rows="6" placeholder="A hardworking individual seeking a challenging position where I can showcase my skills and contribute to the growth of the organization…" oninput="update()"></textarea>
+      </div>
+      <div class="separator"></div>
+      <div class="form-section-label">References</div>
+      <div id="referenceEntries"></div>
+      <button class="add-entry-btn" onclick="addReference()">＋ Add Reference</button>
+    </div>
+
+    <!-- TAB: SETTINGS -->
+    <div id="tab-settings" class="tab-content">
+      <div class="form-section-label">Color Theme</div>
+      <div class="field-group triple">
+        <div class="field"><label>Accent Color</label><input type="color" id="accentColor" value="#2C3E50" oninput="applyTheme()"></div>
+        <div class="field"><label>Section BG</label><input type="color" id="headerBg" value="#F5F5F5" oninput="applyTheme()"></div>
+        <div class="field"><label>Body Font</label>
+          <select id="bodyFont" onchange="applyTheme()">
+            <option value="'Crimson Pro',Georgia,serif">Crimson Pro</option>
+            <option value="'DM Sans',sans-serif">DM Sans</option>
+            <option value="Georgia,serif">Georgia</option>
+            <option value="Arial,sans-serif">Arial</option>
+            <option value="'Times New Roman',serif">Times New Roman</option>
+          </select>
+        </div>
+      </div>
+      <div class="separator"></div>
+      <div class="form-section-label">Show / Hide Sections</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem 1.2rem;">
+        <label style="display:flex;align-items:center;gap:0.5rem;font-size:0.83rem;cursor:pointer;"><input type="checkbox" id="showObjective" checked onchange="update()"> Objective</label>
+        <label style="display:flex;align-items:center;gap:0.5rem;font-size:0.83rem;cursor:pointer;"><input type="checkbox" id="showPersonalTable" checked onchange="update()"> Personal Info</label>
+        <label style="display:flex;align-items:center;gap:0.5rem;font-size:0.83rem;cursor:pointer;"><input type="checkbox" id="showExperience" checked onchange="update()"> Experience</label>
+        <label style="display:flex;align-items:center;gap:0.5rem;font-size:0.83rem;cursor:pointer;"><input type="checkbox" id="showSkills" checked onchange="update()"> Skills</label>
+        <label style="display:flex;align-items:center;gap:0.5rem;font-size:0.83rem;cursor:pointer;"><input type="checkbox" id="showLanguages" checked onchange="update()"> Languages</label>
+        <label style="display:flex;align-items:center;gap:0.5rem;font-size:0.83rem;cursor:pointer;"><input type="checkbox" id="showHobbies" checked onchange="update()"> Hobbies</label>
+        <label style="display:flex;align-items:center;gap:0.5rem;font-size:0.83rem;cursor:pointer;"><input type="checkbox" id="showReferences" onchange="update()"> References</label>
+        <label style="display:flex;align-items:center;gap:0.5rem;font-size:0.83rem;cursor:pointer;"><input type="checkbox" id="showSignature" checked onchange="update()"> Signature Line</label>
       </div>
     </div>
   </div>
-  <!-- Terminal app -->
-  <div id="terminalApp" style="display: none; text-align: center; padding: 20px; background-color: transparent; color: #fff; border-radius: 10px; transition: transform 0.3s ease;">
-    <button onclick="toggleTerminal()" style="background: none; border: none; cursor: pointer;">
-      <img src="https://png2.cleanpng.com/sh/920209b773d553d9d2f95e9f0f566c99/L0KzQYm3VsI6N5x4jZH0aYP2gLBuTfNwdaF6jNd7LYTogr7wjvFtNZR0heJAdHX1PbrqjB50NZ1uhudDLXPyfsT2jPUufJZ3ReZucn3sfrLzTcVjO2c9faNqN0fmQoa5TsY5OWY9UKcEMUW2QIS3Uck4QGUASKc3cH7q/kisspng-computer-terminal-computer-icons-linux-console-ter-terminal-5b368e1a77c252.6815885915303019784905.png" alt="Toggle Terminal" style="width: 50px; height: 50px; transition: transform 0.3s ease;">
-      <div style="font-family: 'Ubuntu', sans-serif; font-size: 14px; margin-top: -5px;">Terminal</div>
-    </button>
+
+  <!-- PREVIEW PANEL -->
+  <div class="preview-panel">
+    <div class="preview-label">Live Preview — A4</div>
+    <div id="cvDocument">
+
+      <div class="cv-header">
+        <div class="cv-header-left">
+          <div class="cv-name" id="cv-name">YOUR NAME</div>
+          <div class="cv-name-bn hidden" id="cv-name-bn"></div>
+          <div class="cv-contact-row" id="cv-contacts"></div>
+        </div>
+        <div class="cv-photo-box" id="cv-photo-box">
+          <img id="cvPhotoImg" src="" alt="" style="display:none">
+          <div class="cv-photo-placeholder" id="cvPhotoPlaceholder">Photo</div>
+        </div>
+      </div>
+
+      <div class="cv-body">
+        <div class="cv-section" id="cv-personal-section">
+          <div class="cv-section-header">Personal Information</div>
+          <table class="cv-info-table"><tbody id="cv-info-tbody"></tbody></table>
+        </div>
+
+        <div class="cv-section hidden" id="cv-objective-section">
+          <div class="cv-section-header">Objective</div>
+          <div class="cv-objective" id="cv-objective-text"></div>
+        </div>
+
+        <div class="cv-section" id="cv-education-section">
+          <div class="cv-section-header">Educational Qualification</div>
+          <table class="cv-edu-table">
+            <thead><tr><th>Degree / Exam</th><th>Board / Institution</th><th>Passing Year</th><th>GPA / Marks</th><th>Result</th></tr></thead>
+            <tbody id="cv-edu-tbody"></tbody>
+          </table>
+        </div>
+
+        <div class="cv-section hidden" id="cv-experience-section">
+          <div class="cv-section-header">Work Experience</div>
+          <div id="cv-experience-list"></div>
+        </div>
+
+        <div class="cv-section hidden" id="cv-skills-section">
+          <div class="cv-section-header">Skills</div>
+          <div class="cv-list-cols" id="cv-skills-list"></div>
+        </div>
+
+        <div class="cv-section hidden" id="cv-languages-section">
+          <div class="cv-section-header">Languages</div>
+          <div class="cv-list-cols" id="cv-languages-list"></div>
+        </div>
+
+        <div class="cv-section hidden" id="cv-hobbies-section">
+          <div class="cv-section-header">Hobbies &amp; Interests</div>
+          <div class="cv-list-cols" id="cv-hobbies-list"></div>
+        </div>
+
+        <div class="cv-section hidden" id="cv-references-section">
+          <div class="cv-section-header">References</div>
+          <div id="cv-references-list" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:0.85rem;"></div>
+        </div>
+
+        <div class="cv-signature-section" id="cv-signature-section">
+          <div class="cv-signature-box">
+            <div class="cv-signature-line"></div>
+            <div class="cv-signature-label" id="cv-sig-name">Signature</div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
-<script src="scripts/script.js"></script>
+<script>
+// ── STATE
+const state = { photo: null, skills: [], languages: [], hobbies: [], education: [], experience: [], references: [] };
+let edCount = 0, exCount = 0, refCount = 0;
+
+// ── INIT
+window.addEventListener('DOMContentLoaded', () => {
+  loadPreviousEntries();
+  addEducation();
+  addExperience();
+  renderAll();
+});
+
+// ── TABS
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ── PHOTO
+function loadPhoto(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    state.photo = ev.target.result;
+    document.getElementById('photoPreview').src = state.photo;
+    document.getElementById('photoPreview').style.display = 'block';
+    document.getElementById('photoPlaceholder').style.display = 'none';
+    document.getElementById('removePhotoBtn').style.display = 'inline-block';
+    document.getElementById('cvPhotoImg').src = state.photo;
+    document.getElementById('cvPhotoImg').style.display = 'block';
+    document.getElementById('cvPhotoPlaceholder').style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+}
+function removePhoto() {
+  state.photo = null;
+  document.getElementById('photoPreview').src = '';
+  document.getElementById('photoPreview').style.display = 'none';
+  document.getElementById('photoPlaceholder').style.display = 'flex';
+  document.getElementById('removePhotoBtn').style.display = 'none';
+  document.getElementById('cvPhotoImg').style.display = 'none';
+  document.getElementById('cvPhotoPlaceholder').style.display = 'block';
+  document.getElementById('photoInput').value = '';
+}
+
+// ── TAGS
+function handleTag(e, key) {
+  const inputMap = { skills:'skillInput', languages:'langInput', hobbies:'hobbyInput' };
+  const wrapMap  = { skills:'skillsWrapper', languages:'languagesWrapper', hobbies:'hobbiesWrapper' };
+  const inp = document.getElementById(inputMap[key]);
+  if (e.key === 'Enter' || e.key === ',') {
+    e.preventDefault();
+    const val = inp.value.replace(',','').trim();
+    if (val && !state[key].includes(val)) {
+      state[key].push(val);
+      const wrap = document.getElementById(wrapMap[key]);
+      const tag = document.createElement('span');
+      tag.className = 'tag';
+      tag.dataset.val = val;
+      tag.dataset.key = key;
+      tag.innerHTML = `${val} <span class="tag-remove" onclick="removeTag(this)">×</span>`;
+      wrap.insertBefore(tag, inp);
+      renderAll();
+    }
+    inp.value = '';
+  } else if (e.key === 'Backspace' && inp.value === '' && state[key].length) {
+    const last = state[key].pop();
+    const wrapEl = document.getElementById(wrapMap[key]);
+    const tags = wrapEl.querySelectorAll('.tag');
+    tags[tags.length-1]?.remove();
+    renderAll();
+  }
+}
+function removeTag(el) {
+  const tag = el.parentElement;
+  const key = tag.dataset.key;
+  const val = tag.dataset.val;
+  state[key] = state[key].filter(v => v !== val);
+  tag.remove();
+  renderAll();
+}
+
+// ── EDUCATION
+function addEducation() {
+  const id = edCount++;
+  state.education.push({ id, degree:'', board:'', year:'', gpa:'', result:'' });
+  const c = document.getElementById('educationEntries');
+  const d = document.createElement('div');
+  d.className = 'entry-card'; d.id = 'edu-'+id;
+  d.innerHTML = `
+    <div class="entry-card-header"><span class="entry-card-title">Entry #${id+1}</span><button class="btn btn-danger" onclick="rmEdu(${id})">Remove</button></div>
+    <div class="field-group full"><div class="field"><label>Degree / Exam</label>
+      <input type="text" id="ed-deg-${id}" placeholder="e.g. SSC, HSC, B.Sc." oninput="syncEdu(${id})" list="dl-deg">
+      <datalist id="dl-deg"><option value="SSC / Matric"><option value="HSC / Intermediate"><option value="B.Sc."><option value="M.Sc."><option value="BBA"><option value="MBA"><option value="Diploma"><option value="MBBS"><option value="LL.B"></datalist>
+    </div></div>
+    <div class="field-group">
+      <div class="field"><label>Board / Institution</label><input type="text" id="ed-brd-${id}" placeholder="e.g. Dhaka Board" oninput="syncEdu(${id})"></div>
+      <div class="field"><label>Passing Year</label><input type="number" id="ed-yr-${id}" placeholder="2022" min="1980" max="2030" oninput="syncEdu(${id})"></div>
+    </div>
+    <div class="field-group">
+      <div class="field"><label>GPA / Marks</label><input type="text" id="ed-gpa-${id}" placeholder="5.00 or 870/1100" oninput="syncEdu(${id})"></div>
+      <div class="field"><label>Result / Grade</label>
+        <select id="ed-res-${id}" onchange="syncEdu(${id})">
+          <option value="">— Select —</option><option>A+</option><option>A</option><option>A-</option><option>B+</option><option>B</option><option>C</option><option>Pass</option><option>Distinction</option><option>First Class</option><option>Second Class</option>
+        </select>
+      </div>
+    </div>`;
+  c.appendChild(d);
+}
+function syncEdu(id) {
+  const e = state.education.find(x => x.id===id); if (!e) return;
+  e.degree  = document.getElementById('ed-deg-'+id)?.value||'';
+  e.board   = document.getElementById('ed-brd-'+id)?.value||'';
+  e.year    = document.getElementById('ed-yr-'+id)?.value||'';
+  e.gpa     = document.getElementById('ed-gpa-'+id)?.value||'';
+  e.result  = document.getElementById('ed-res-'+id)?.value||'';
+  renderAll();
+}
+function rmEdu(id) { state.education = state.education.filter(x=>x.id!==id); document.getElementById('edu-'+id)?.remove(); renderAll(); }
+
+// ── EXPERIENCE
+function addExperience() {
+  const id = exCount++;
+  state.experience.push({ id, title:'', company:'', from:'', to:'', current:false, desc:'' });
+  const c = document.getElementById('experienceEntries');
+  const d = document.createElement('div');
+  d.className = 'entry-card'; d.id = 'ex-'+id;
+  d.innerHTML = `
+    <div class="entry-card-header"><span class="entry-card-title">Position #${id+1}</span><button class="btn btn-danger" onclick="rmEx(${id})">Remove</button></div>
+    <div class="field-group">
+      <div class="field"><label>Job Title</label><input type="text" id="ex-ttl-${id}" placeholder="e.g. Software Engineer" oninput="syncEx(${id})"></div>
+      <div class="field"><label>Company / Organization</label><input type="text" id="ex-cmp-${id}" placeholder="Company name" oninput="syncEx(${id})"></div>
+    </div>
+    <div class="field-group triple">
+      <div class="field"><label>From</label><input type="month" id="ex-from-${id}" oninput="syncEx(${id})"></div>
+      <div class="field"><label>To</label><input type="month" id="ex-to-${id}" oninput="syncEx(${id})"></div>
+      <div class="field" style="justify-content:flex-end;padding-top:1.4rem;">
+        <label style="flex-direction:row;align-items:center;gap:6px;text-transform:none;letter-spacing:0;cursor:pointer;font-size:0.82rem;">
+          <input type="checkbox" id="ex-cur-${id}" onchange="toggleCur(${id})"> Present
+        </label>
+      </div>
+    </div>
+    <div class="field-group full"><div class="field"><label>Description / Responsibilities</label>
+      <textarea id="ex-desc-${id}" rows="3" placeholder="Brief description of your role…" oninput="syncEx(${id})"></textarea>
+    </div></div>`;
+  c.appendChild(d);
+}
+function toggleCur(id) {
+  const cur = document.getElementById('ex-cur-'+id).checked;
+  const toEl = document.getElementById('ex-to-'+id);
+  if (toEl) { toEl.disabled = cur; if (cur) toEl.value = ''; }
+  syncEx(id);
+}
+function syncEx(id) {
+  const e = state.experience.find(x=>x.id===id); if (!e) return;
+  e.title   = document.getElementById('ex-ttl-'+id)?.value||'';
+  e.company = document.getElementById('ex-cmp-'+id)?.value||'';
+  e.from    = document.getElementById('ex-from-'+id)?.value||'';
+  e.to      = document.getElementById('ex-to-'+id)?.value||'';
+  e.current = document.getElementById('ex-cur-'+id)?.checked||false;
+  e.desc    = document.getElementById('ex-desc-'+id)?.value||'';
+  renderAll();
+}
+function rmEx(id) { state.experience = state.experience.filter(x=>x.id!==id); document.getElementById('ex-'+id)?.remove(); renderAll(); }
+
+// ── REFERENCES
+function addReference() {
+  const id = refCount++;
+  state.references.push({ id, name:'', title:'', org:'', phone:'', email:'' });
+  const c = document.getElementById('referenceEntries');
+  const d = document.createElement('div');
+  d.className = 'entry-card'; d.id = 'ref-'+id;
+  d.innerHTML = `
+    <div class="entry-card-header"><span class="entry-card-title">Reference #${id+1}</span><button class="btn btn-danger" onclick="rmRef(${id})">Remove</button></div>
+    <div class="field-group">
+      <div class="field"><label>Name</label><input type="text" id="rf-nm-${id}" placeholder="Full name" oninput="syncRef(${id})"></div>
+      <div class="field"><label>Designation</label><input type="text" id="rf-ttl-${id}" placeholder="e.g. Professor" oninput="syncRef(${id})"></div>
+    </div>
+    <div class="field-group full"><div class="field"><label>Organization</label><input type="text" id="rf-org-${id}" placeholder="Institution / Company" oninput="syncRef(${id})"></div></div>
+    <div class="field-group">
+      <div class="field"><label>Phone</label><input type="tel" id="rf-ph-${id}" placeholder="+880…" oninput="syncRef(${id})"></div>
+      <div class="field"><label>Email</label><input type="email" id="rf-em-${id}" placeholder="ref@email.com" oninput="syncRef(${id})"></div>
+    </div>`;
+  c.appendChild(d);
+}
+function syncRef(id) {
+  const r = state.references.find(x=>x.id===id); if (!r) return;
+  r.name  = document.getElementById('rf-nm-'+id)?.value||'';
+  r.title = document.getElementById('rf-ttl-'+id)?.value||'';
+  r.org   = document.getElementById('rf-org-'+id)?.value||'';
+  r.phone = document.getElementById('rf-ph-'+id)?.value||'';
+  r.email = document.getElementById('rf-em-'+id)?.value||'';
+  renderAll();
+}
+function rmRef(id) { state.references = state.references.filter(x=>x.id!==id); document.getElementById('ref-'+id)?.remove(); renderAll(); }
+
+// ── HELPERS
+function v(id) { return document.getElementById(id)?.value||''; }
+function chk(id) { return document.getElementById(id)?.checked ?? true; }
+function show(el, visible) { el && (el.classList[visible?'remove':'add']('hidden')); }
+function fmtDate(s) { if (!s) return ''; const d=new Date(s+'T00:00:00'); return d.toLocaleDateString('en-GB',{day:'2-digit',month:'2-digit',year:'numeric'}); }
+function fmtMonth(s) { if (!s) return ''; const [y,m]=s.split('-'); return ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][+m-1]+' '+y; }
+
+// ── MAIN RENDER
+function renderAll() {
+  saveSession();
+
+  // Name
+  document.getElementById('cv-name').textContent = (v('nameEn')||'YOUR NAME').toUpperCase();
+  document.getElementById('cv-sig-name').textContent = v('nameEn')||'Signature';
+  const bnEl = document.getElementById('cv-name-bn');
+  bnEl.textContent = v('nameBn');
+  show(bnEl, !!v('nameBn'));
+
+  // Contacts
+  const contacts = [];
+  if (v('phone'))          contacts.push(`<strong>Phone:</strong> ${v('phone')}`);
+  if (v('email'))          contacts.push(`<strong>Email:</strong> ${v('email')}`);
+  if (v('addressPresent')) contacts.push(`<strong>Address:</strong> ${v('addressPresent')}`);
+  if (v('linkedin'))       contacts.push(`<strong>LinkedIn:</strong> ${v('linkedin')}`);
+  if (v('website'))        contacts.push(`<strong>Web:</strong> ${v('website')}`);
+  document.getElementById('cv-contacts').innerHTML = contacts.map(c=>`<span class="cv-contact-item">${c}</span>`).join('');
+
+  // Personal table
+  const personalSec = document.getElementById('cv-personal-section');
+  show(personalSec, chk('showPersonalTable'));
+  if (chk('showPersonalTable')) {
+    const rows = [];
+    const row = (l,val) => { if (val) rows.push(`<tr><td>${l}</td><td>:</td><td>${val}</td></tr>`); };
+    row("Father's Name", v('fatherName'));
+    row("Mother's Name", v('motherName'));
+    row('Date of Birth',  fmtDate(v('dob')));
+    row('Nationality',    v('nationality'));
+    row('Marital Status', v('maritalStatus'));
+    row('Religion',       v('religion'));
+    row('Blood Group',    v('bloodGroup'));
+    row('NID / Passport', v('nid'));
+    row('Permanent Address', v('addressPermanent'));
+    document.getElementById('cv-info-tbody').innerHTML = rows.join('');
+  }
+
+  // Objective
+  const objSec = document.getElementById('cv-objective-section');
+  const objTxt = v('objective');
+  show(objSec, chk('showObjective') && !!objTxt);
+  document.getElementById('cv-objective-text').textContent = objTxt;
+
+  // Education
+  const edRows = state.education.filter(e=>e.degree||e.board);
+  document.getElementById('cv-edu-tbody').innerHTML = edRows.map(e=>`<tr><td>${e.degree}</td><td>${e.board}</td><td>${e.year}</td><td>${e.gpa}</td><td>${e.result}</td></tr>`).join('');
+  show(document.getElementById('cv-education-section'), edRows.length>0);
+
+  // Experience
+  const exEntries = state.experience.filter(e=>e.title||e.company);
+  const expSec = document.getElementById('cv-experience-section');
+  show(expSec, chk('showExperience') && exEntries.length>0);
+  document.getElementById('cv-experience-list').innerHTML = exEntries.map(e=>{
+    const from=fmtMonth(e.from), to=e.current?'Present':fmtMonth(e.to);
+    const period=(from||to)?`${from}${from&&to?' – ':''}${to}`:'';
+    return `<div class="cv-exp-item">
+      <div class="cv-exp-header"><span class="cv-exp-title">${e.title}</span><span class="cv-exp-period">${period}</span></div>
+      <div class="cv-exp-company">${e.company}</div>
+      ${e.desc?`<div class="cv-exp-desc">${e.desc}</div>`:''}
+    </div>`;
+  }).join('');
+
+  // Skills / Languages / Hobbies
+  const skillsSec = document.getElementById('cv-skills-section');
+  show(skillsSec, chk('showSkills') && state.skills.length>0);
+  document.getElementById('cv-skills-list').innerHTML = state.skills.map(s=>`<div class="cv-list-item">${s}</div>`).join('');
+
+  const langSec = document.getElementById('cv-languages-section');
+  show(langSec, chk('showLanguages') && state.languages.length>0);
+  document.getElementById('cv-languages-list').innerHTML = state.languages.map(l=>`<div class="cv-list-item">${l}</div>`).join('');
+
+  const hobbySec = document.getElementById('cv-hobbies-section');
+  show(hobbySec, chk('showHobbies') && state.hobbies.length>0);
+  document.getElementById('cv-hobbies-list').innerHTML = state.hobbies.map(h=>`<div class="cv-list-item">${h}</div>`).join('');
+
+  // References
+  const refEntries = state.references.filter(r=>r.name);
+  const refSec = document.getElementById('cv-references-section');
+  show(refSec, chk('showReferences') && refEntries.length>0);
+  document.getElementById('cv-references-list').innerHTML = refEntries.map(r=>`
+    <div><strong style="color:var(--cv-accent)">${r.name}</strong><br>
+    <span style="color:#555;font-style:italic">${r.title}</span><br>
+    <span>${r.org}</span><br>
+    ${r.phone?`<span style="font-size:0.8rem">📞 ${r.phone}</span><br>`:''}
+    ${r.email?`<span style="font-size:0.8rem">✉ ${r.email}</span>`:''}</div>`).join('');
+
+  // Signature
+  show(document.getElementById('cv-signature-section'), chk('showSignature'));
+}
+
+// Alias for oninput
+function update() { renderAll(); }
+
+// ── THEME
+function applyTheme() {
+  const cv = document.getElementById('cvDocument');
+  cv.style.setProperty('--cv-accent', document.getElementById('accentColor').value);
+  cv.style.setProperty('--cv-gray',   document.getElementById('headerBg').value);
+  cv.style.fontFamily = document.getElementById('bodyFont').value;
+}
+
+// ── LOCAL STORAGE
+const FIELDS = ['nameEn','nameBn','fatherName','motherName','nationality','religion','phone','email','addressPresent'];
+function saveSession() {
+  const ses = {};
+  ['nameEn','nameBn','fatherName','motherName','dob','nationality','maritalStatus','religion','bloodGroup','nid','phone','email','addressPresent','addressPermanent','linkedin','website','objective'].forEach(id => {
+    ses[id] = document.getElementById(id)?.value||'';
+  });
+  try { localStorage.setItem('cvmaker_session', JSON.stringify(ses)); } catch(e){}
+
+  // Save datalist suggestions
+  FIELDS.forEach(id => {
+    const val = document.getElementById(id)?.value;
+    if (!val) return;
+    try {
+      const prev = JSON.parse(localStorage.getItem('cvmaker_prev_'+id)||'[]');
+      if (!prev.includes(val)) { prev.unshift(val); if (prev.length>6) prev.pop(); localStorage.setItem('cvmaker_prev_'+id, JSON.stringify(prev)); }
+    } catch(e){}
+  });
+}
+
+function loadPreviousEntries() {
+  // Fill datalists
+  FIELDS.forEach(id => {
+    try {
+      const prev = JSON.parse(localStorage.getItem('cvmaker_prev_'+id)||'[]');
+      const dl = document.getElementById('dl-'+id);
+      if (dl) dl.innerHTML = prev.map(p=>`<option value="${p}">`).join('');
+    } catch(e){}
+  });
+  // Restore last session
+  try {
+    const ses = JSON.parse(localStorage.getItem('cvmaker_session')||'{}');
+    Object.keys(ses).forEach(id => { const el = document.getElementById(id); if (el && ses[id]) el.value = ses[id]; });
+  } catch(e){}
+}
+
+// ── PDF
+function downloadPDF() {
+  const el = document.getElementById('cvDocument');
+  const name = v('nameEn') || 'CV';
+  const btn = event.currentTarget;
+  btn.textContent = 'Generating…'; btn.disabled = true;
+  html2pdf().set({
+    margin: 0,
+    filename: name.replace(/\s+/g,'_')+'_CV.pdf',
+    image: { type:'jpeg', quality:0.98 },
+    html2canvas: { scale:2, useCORS:true },
+    jsPDF: { unit:'mm', format:'a4', orientation:'portrait' }
+  }).from(el).save().then(()=>{ btn.textContent='↓ Download PDF'; btn.disabled=false; });
+}
+
+// ── CLEAR ALL
+function clearAll() {
+  if (!confirm('Clear all fields and start fresh?')) return;
+  ['nameEn','nameBn','fatherName','motherName','dob','nationality','maritalStatus','religion','bloodGroup','nid','phone','email','addressPresent','addressPermanent','linkedin','website','objective'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  removePhoto();
+  state.skills=[]; state.languages=[]; state.hobbies=[];
+  ['skillsWrapper','languagesWrapper','hobbiesWrapper'].forEach(w=>{ const wr=document.getElementById(w); wr.querySelectorAll('.tag').forEach(t=>t.remove()); });
+  state.education=[]; state.experience=[]; state.references=[];
+  document.getElementById('educationEntries').innerHTML='';
+  document.getElementById('experienceEntries').innerHTML='';
+  document.getElementById('referenceEntries').innerHTML='';
+  edCount=0; exCount=0; refCount=0;
+  addEducation(); addExperience();
+  renderAll();
+}
+
+renderAll();
+</script>
 </body>
 </html>
