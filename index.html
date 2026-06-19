@@ -1,531 +1,788 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <meta name="theme-color" content="#2196F3">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Attendance">
-    <link rel="manifest" href="manifest.json">
-    <title>Simple Attendance System</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+  <meta name="theme-color" content="#667eea">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Attendance">
+  <meta name="description" content="Simple and efficient student attendance tracking system">
+  <link rel="manifest" href="manifest.json">
+  <title>Attendance System</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    :root {
+      --bg: #f8f7ff;
+      --surface: #ffffff;
+      --text: #1e1b4b;
+      --text-secondary: #5b5575;
+      --primary: #667eea;
+      --primary-light: #764ba2;
+      --gradient-start: #667eea;
+      --gradient-end: #764ba2;
+      --border: #e0e0f0;
+      --card-bg: #ffffff;
+      --shadow: 0 25px 45px rgba(0, 0, 0, 0.08);
+      --button-text: white;
+      --toggle-absent: #ef4444;
+      --toggle-present: #10b981;
+      --stat-bg: #f3f0ff;
+      --logout-bg: #fee2e2;
+      --logout-text: #b91c1c;
+      --timer-bg: #ede9fe;
+    }
+    body.dark {
+      --bg: #0c0c1d;
+      --surface: #1a1a2e;
+      --text: #e2e8f0;
+      --text-secondary: #b9b7d4;
+      --primary: #a78bfa;
+      --primary-light: #c4b5fd;
+      --gradient-start: #667eea;
+      --gradient-end: #764ba2;
+      --border: #2d2d4a;
+      --card-bg: #252540;
+      --shadow: 0 25px 50px rgba(0, 0, 0, 0.6);
+      --button-text: #ffffff;
+      --toggle-absent: #b91c1c;
+      --toggle-present: #047857;
+      --stat-bg: #2a2a44;
+      --logout-bg: #3b1e1e;
+      --logout-text: #fecaca;
+      --timer-bg: #2d2b4a;
+    }
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      transition: background 0.3s, color 0.3s;
+      margin: 0;
+      color: var(--text);
+    }
+    body.dark {
+      background: linear-gradient(135deg, #1a1a2e, #16213e);
+    }
+    .app-wrapper {
+      width: 100%;
+      max-width: 650px;
+      margin: 0 auto;
+    }
+    .login-card, .main-container {
+      background: var(--surface);
+      border-radius: 38px;
+      padding: 2.4rem 2rem;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      transition: all 0.3s;
+      backdrop-filter: blur(10px);
+    }
+    .hidden {
+      display: none !important;
+    }
     
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 15px;
-            min-height: 100vh;
-            -webkit-tap-highlight-color: transparent;
-            user-select: none;
-        }
-        
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 25px;
-            padding: 25px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-        }
-        
-        .header {
-            text-align: center;
-            margin-bottom: 25px;
-            padding-bottom: 20px;
-            border-bottom: 3px solid #f0f0f0;
-        }
-        
-        .header h1 {
-            font-size: 2rem;
-            color: #667eea;
-            margin-bottom: 8px;
-        }
-        
-        .header .date-display {
-            color: #666;
-            font-size: 0.95rem;
-            font-weight: 500;
-        }
-        
-        .controls {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-bottom: 25px;
-        }
-        
-        .control-row {
-            display: flex;
-            gap: 10px;
-        }
-        
-        select, input, button {
-            padding: 14px 18px;
-            border: 2px solid #e0e0e0;
-            border-radius: 15px;
-            font-size: 16px;
-            font-family: inherit;
-            transition: all 0.3s;
-            background: white;
-            width: 100%;
-        }
-        
-        select:focus, input:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 4px rgba(102,126,234,0.1);
-        }
-        
-        button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            font-weight: 700;
-            cursor: pointer;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-            font-size: 15px;
-            transition: all 0.3s;
-        }
-        
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102,126,234,0.3);
-        }
-        
-        button:active {
-            transform: scale(0.97);
-        }
-        
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            margin: 25px 0;
-            text-align: center;
-        }
-        
-        .stat-card {
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            padding: 18px 12px;
-            border-radius: 18px;
-            transition: all 0.3s;
-        }
-        
-        .stat-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-        }
-        
-        .stat-number {
-            font-size: 2.2rem;
-            font-weight: 800;
-            color: #667eea;
-        }
-        
-        .stat-label {
-            font-size: 0.85rem;
-            color: #555;
-            margin-top: 8px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        .student {
-            background: #f8f9fa;
-            padding: 16px;
-            margin-bottom: 12px;
-            border-radius: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: all 0.3s;
-            border: 2px solid transparent;
-        }
-        
-        .student:hover {
-            border-color: #667eea;
-            transform: translateX(5px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-        
-        .student-info {
-            flex: 1;
-        }
-        
-        .student-id {
-            font-weight: 700;
-            font-size: 1.15rem;
-            color: #333;
-        }
-        
-        .student-name {
-            color: #666;
-            font-size: 0.95rem;
-            margin-top: 5px;
-            font-weight: 500;
-        }
-        
-        .toggle {
-            width: 65px;
-            height: 65px;
-            border: none;
-            border-radius: 18px;
-            color: white;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-        
-        .toggle:hover {
-            transform: scale(1.1);
-        }
-        
-        .toggle:active {
-            transform: scale(0.9);
-        }
-        
-        .absent {
-            background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
-        }
-        
-        .present {
-            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-        }
-        
-        .empty-state {
-            text-align: center;
-            padding: 50px 20px;
-            color: #999;
-        }
-        
-        .empty-state .icon {
-            font-size: 4rem;
-            margin-bottom: 15px;
-            animation: bounce 2s infinite;
-        }
-        
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-        
-        .action-buttons {
-            display: flex;
-            gap: 10px;
-            margin: 18px 0;
-            flex-wrap: wrap;
-        }
-        
-        .action-btn {
-            flex: 1;
-            min-width: 130px;
-            padding: 12px;
-            font-size: 0.9rem;
-            font-weight: 600;
-        }
-        
-        .install-btn {
-            display: none;
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: white;
-            color: #667eea;
-            border: 2px solid #667eea;
-            border-radius: 50px;
-            padding: 12px 24px;
-            font-weight: 700;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-            z-index: 1000;
-            animation: slideUp 0.5s ease;
-        }
-        
-        @keyframes slideUp {
-            from { transform: translateY(100px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        
-        @media (max-width: 480px) {
-            body { padding: 10px; }
-            .container { padding: 18px; border-radius: 20px; }
-            .toggle { width: 60px; height: 60px; font-size: 24px; }
-            .stat-number { font-size: 1.8rem; }
-            .header h1 { font-size: 1.6rem; }
-        }
-    </style>
+    .login-title {
+      font-size: 2.2rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.2rem;
+    }
+    
+    .gradient-heading {
+      font-size: 1.9rem;
+      background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .input-field {
+      width: 100%;
+      padding: 16px 18px;
+      border: 2px solid var(--border);
+      border-radius: 20px;
+      font-size: 16px;
+      background: var(--card-bg);
+      color: var(--text);
+      margin: 14px 0;
+      outline: none;
+      transition: 0.2s;
+    }
+    .input-field:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.25);
+    }
+    .btn {
+      background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+      color: var(--button-text);
+      border: none;
+      border-radius: 20px;
+      padding: 16px 22px;
+      font-weight: 700;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.2s;
+      width: 100%;
+      letter-spacing: 0.4px;
+      margin: 8px 0;
+    }
+    .btn:hover {
+      filter: brightness(1.15);
+      transform: translateY(-1px);
+      box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+    }
+    
+    .header-section {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    
+    .header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    
+    .user-info-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--stat-bg);
+      border-radius: 20px;
+      padding: 12px 20px;
+      margin-top: 5px;
+    }
+    
+    .user-badge {
+      font-weight: 600;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--text);
+    }
+    
+    .logout-btn {
+      background: var(--logout-bg);
+      color: var(--logout-text);
+      border: 2px solid var(--logout-text);
+      border-radius: 30px;
+      padding: 10px 20px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+    
+    .logout-btn:hover {
+      background: var(--logout-text);
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    }
+    
+    .theme-toggle-btn {
+      background: transparent;
+      border: none;
+      font-size: 1.8rem;
+      padding: 5px 12px;
+      cursor: pointer;
+      border-radius: 20px;
+      transition: transform 0.2s;
+    }
+    
+    .theme-toggle-btn:hover {
+      transform: scale(1.1);
+    }
+    
+    .date-display {
+      margin: 5px 0;
+      color: var(--text-secondary);
+      font-weight: 500;
+      font-size: 0.95rem;
+    }
+    .control-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin: 15px 0;
+    }
+    select, input {
+      padding: 14px 16px;
+      border: 2px solid var(--border);
+      border-radius: 18px;
+      background: var(--card-bg);
+      color: var(--text);
+      flex: 1;
+      font-weight: 500;
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin: 18px 0;
+    }
+    .stat-card {
+      background: var(--stat-bg);
+      padding: 16px 6px;
+      border-radius: 20px;
+      text-align: center;
+      font-weight: 600;
+    }
+    .student {
+      background: var(--card-bg);
+      border: 2px solid var(--border);
+      border-radius: 22px;
+      padding: 14px 16px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .toggle {
+      width: 62px;
+      height: 62px;
+      border-radius: 20px;
+      font-size: 28px;
+      border: none;
+      color: white;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .toggle:hover {
+      transform: scale(1.1);
+    }
+    .absent-bg { background: var(--toggle-absent); }
+    .present-bg { background: var(--toggle-present); }
+    .timer-box {
+      background: var(--timer-bg);
+      border-radius: 20px;
+      padding: 12px 16px;
+      margin: 18px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .submit-btn {
+      background: #0f172a;
+      color: white;
+      border: none;
+      border-radius: 20px;
+      padding: 16px;
+      font-weight: bold;
+      width: 100%;
+      margin-top: 12px;
+      transition: 0.2s;
+    }
+    .submit-btn:hover {
+      background: #1e293b;
+      transform: translateY(-2px);
+    }
+    .install-btn {
+      position: fixed;
+      bottom: 25px;
+      right: 25px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 60px;
+      padding: 14px 24px;
+      font-weight: bold;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+      z-index: 999;
+      display: none;
+      animation: slideIn 0.3s ease;
+    }
+    
+    @keyframes slideIn {
+      from { transform: translateX(100px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    
+    .logged-in-indicator {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      background: #10b981;
+      border-radius: 50%;
+      margin-right: 5px;
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+      70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+    
+    /* Offline indicator */
+    .offline-banner {
+      background: #f59e0b;
+      color: white;
+      text-align: center;
+      padding: 8px;
+      border-radius: 10px;
+      margin-bottom: 10px;
+      font-weight: 600;
+      display: none;
+    }
+    
+    .offline-banner.show {
+      display: block;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>📋 Attendance System</h1>
-            <div class="date-display" id="currentDateDisplay"></div>
-        </div>
-        
-        <div class="controls">
-            <div class="control-row">
-                <input type="date" id="date" style="flex:1">
-                <select id="course" style="flex:1">
-                    <option value="">📚 Select Course</option>
-                    <option value="CSE101">💻 CSE101 - Programming</option>
-                    <option value="CSE201">🗄️ CSE201 - Database</option>
-                    <option value="CSE301">🌐 CSE301 - Networking</option>
-                </select>
-            </div>
-            <button onclick="loadStudents()">📥 Load Students</button>
-        </div>
-        
-        <div class="stats">
-            <div class="stat-card">
-                <div class="stat-number" id="total">0</div>
-                <div class="stat-label">Total</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number" id="present" style="color:#11998e">0</div>
-                <div class="stat-label">Present</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number" id="absent" style="color:#ff416c">0</div>
-                <div class="stat-label">Absent</div>
-            </div>
-        </div>
-        
-        <div class="action-buttons">
-            <button class="action-btn" onclick="markAll(1)">✅ All Present</button>
-            <button class="action-btn" onclick="markAll(0)">❌ All Absent</button>
-        </div>
-        
-        <div id="students"></div>
-    </div>
+  <div class="app-wrapper">
+    <!-- Offline Banner -->
+    <div id="offlineBanner" class="offline-banner">📡 You are offline - cached data loaded</div>
     
-    <button class="install-btn" id="installBtn">📱 Install App</button>
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-card">
+      <div style="text-align: center; margin-bottom: 18px;">
+        <span style="font-size: 3.2rem;">📋</span>
+        <div class="login-title">Attendance System</div>
+        <p style="color: var(--text-secondary);">Secure sign in</p>
+      </div>
+      <input type="text" id="usernameInput" class="input-field" placeholder="Choose a username" autocomplete="off">
+      <input type="password" id="passwordInput" class="input-field" placeholder="Password (asd)" value="asd">
+      <button class="btn" id="loginSubmitBtn">🔐 Login</button>
+      <p style="font-size:0.8rem; margin-top:12px; color:var(--text-secondary);">Username saved permanently • Password resets every 12h</p>
+    </div>
 
-    <script>
-        // Set today's date and display
+    <!-- Main App -->
+    <div id="mainApp" class="main-container hidden">
+      <div class="header-section">
+        <div class="header-row">
+          <h1 class="gradient-heading">📋 Attendance</h1>
+          <button id="themeToggle" class="theme-toggle-btn" title="Toggle theme">🌙</button>
+        </div>
+        
+        <!-- User Info & Logout Bar - Always visible when logged in -->
+        <div class="user-info-bar">
+          <span class="user-badge">
+            <span class="logged-in-indicator"></span>
+            <span id="liveUsernameDisplay">👤 user</span>
+          </span>
+          <button id="logoutButton" class="logout-btn">🚪 Logout</button>
+        </div>
+        
+        <div class="date-display" id="currentDateDisplay"></div>
+      </div>
+      
+      <!-- Session Timer -->
+      <div class="timer-box">
+        <span>⏳ Session expires in</span>
+        <span id="timerCountdown">--:--:--</span>
+      </div>
+
+      <div class="control-row">
+        <input type="date" id="datePicker">
+        <select id="courseSelect">
+          <option value="">📚 Course</option>
+          <option value="CSE101">💻 CSE101</option>
+          <option value="CSE201">🗄️ CSE201</option>
+          <option value="CSE301">🌐 CSE301</option>
+        </select>
+      </div>
+      <button class="btn" id="loadStudentsBtn">📥 Load Students</button>
+
+      <div class="stats">
+        <div class="stat-card"><span id="totalStat">0</span><br>Total</div>
+        <div class="stat-card"><span id="presentStat" style="color:#10b981;">0</span><br>Present</div>
+        <div class="stat-card"><span id="absentStat" style="color:#ef4444;">0</span><br>Absent</div>
+      </div>
+
+      <div style="display:flex; gap:10px; margin:10px 0;">
+        <button class="btn" id="markAllPresent">✅ All Present</button>
+        <button class="btn" id="markAllAbsent">❌ All Absent</button>
+      </div>
+
+      <div id="studentContainer"></div>
+      
+      <!-- Final Submit Button -->
+      <button id="finalSubmitBtn" class="submit-btn">📌 SUBMIT FINAL ATTENDANCE</button>
+    </div>
+  </div>
+
+  <button id="installButton" class="install-btn">📱 Install App</button>
+
+  <script>
+    // Register Service Worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('service-worker.js')
+          .then(registration => {
+            console.log('ServiceWorker registration successful with scope: ', registration.scope);
+          })
+          .catch(err => {
+            console.log('ServiceWorker registration failed: ', err);
+          });
+      });
+    }
+
+    // Online/Offline detection
+    window.addEventListener('online', () => {
+      document.getElementById('offlineBanner').classList.remove('show');
+    });
+    
+    window.addEventListener('offline', () => {
+      document.getElementById('offlineBanner').classList.add('show');
+    });
+
+    (function() {
+      const PASSWORD = "asd";
+      const SESSION_KEY = "att_session_v2";
+      const THEME_KEY = "att_theme";
+      const USERNAME_STORAGE = "att_username";
+      const COURSE_STORAGE = "att_course";
+      const FINAL_SUBMIT_PREFIX = "final_att_";
+
+      const courseData = {
+        CSE101: [
+          {id: "221152001", name: "Imran Rahman"},
+          {id: "221152002", name: "Mahmud Hasan"},
+          {id: "221152003", name: "Rakib Ahmed"}
+        ],
+        CSE201: [
+          {id: "221152004", name: "Nayeem Islam"},
+          {id: "221152005", name: "Fahim Hossain"},
+          {id: "221152006", name: "Tanvir Ahmed"}
+        ],
+        CSE301: [
+          {id: "221152007", name: "Shuvo Das"},
+          {id: "221152008", name: "Sajid Rahman"},
+          {id: "221152009", name: "Arafat Hossain"}
+        ]
+      };
+
+      const loginScreen = document.getElementById('loginScreen');
+      const mainApp = document.getElementById('mainApp');
+      const usernameInput = document.getElementById('usernameInput');
+      const passwordInput = document.getElementById('passwordInput');
+      const loginSubmitBtn = document.getElementById('loginSubmitBtn');
+      const themeToggle = document.getElementById('themeToggle');
+      const liveUsernameDisplay = document.getElementById('liveUsernameDisplay');
+      const logoutButton = document.getElementById('logoutButton');
+      const datePicker = document.getElementById('datePicker');
+      const courseSelect = document.getElementById('courseSelect');
+      const loadBtn = document.getElementById('loadStudentsBtn');
+      const studentContainer = document.getElementById('studentContainer');
+      const totalStat = document.getElementById('totalStat');
+      const presentStat = document.getElementById('presentStat');
+      const absentStat = document.getElementById('absentStat');
+      const installBtn = document.getElementById('installButton');
+      const currentDateDisplay = document.getElementById('currentDateDisplay');
+      const timerCountdown = document.getElementById('timerCountdown');
+      const finalSubmitBtn = document.getElementById('finalSubmitBtn');
+
+      let deferredPrompt = null;
+      let sessionTimer = null;
+      let countdownInterval = null;
+      let sessionExpiryTime = null;
+
+      // ---------- Theme ----------
+      function setTheme(isDark) {
+        document.body.classList.toggle('dark', isDark);
+        themeToggle.textContent = isDark ? '☀️' : '🌙';
+        localStorage.setItem(THEME_KEY, isDark ? 'dark' : 'light');
+      }
+      function loadTheme() {
+        const saved = localStorage.getItem(THEME_KEY);
+        setTheme(saved === 'dark');
+      }
+      themeToggle.addEventListener('click', () => {
+        setTheme(!document.body.classList.contains('dark'));
+      });
+
+      // ---------- Timer Display ----------
+      function updateTimerDisplay() {
+        if (!sessionExpiryTime) {
+          timerCountdown.textContent = '--:--:--';
+          return;
+        }
+        const now = Date.now();
+        const diff = sessionExpiryTime - now;
+        if (diff <= 0) {
+          timerCountdown.textContent = '00:00:00';
+          return;
+        }
+        const hrs = Math.floor(diff / (1000 * 60 * 60));
+        const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const secs = Math.floor((diff % (1000 * 60)) / 1000);
+        timerCountdown.textContent = `${hrs.toString().padStart(2,'0')}:${mins.toString().padStart(2,'0')}:${secs.toString().padStart(2,'0')}`;
+      }
+
+      function startCountdown() {
+        if (countdownInterval) clearInterval(countdownInterval);
+        updateTimerDisplay();
+        countdownInterval = setInterval(updateTimerDisplay, 1000);
+      }
+
+      function clearTimers() {
+        if (sessionTimer) clearTimeout(sessionTimer);
+        if (countdownInterval) clearInterval(countdownInterval);
+        sessionTimer = null;
+        countdownInterval = null;
+        sessionExpiryTime = null;
+        timerCountdown.textContent = '--:--:--';
+      }
+
+      function startAutoLogout(expiryTime) {
+        clearTimers();
+        sessionExpiryTime = expiryTime;
+        const now = Date.now();
+        const delay = expiryTime - now;
+        if (delay <= 0) {
+          performLogout();
+          return;
+        }
+        startCountdown();
+        sessionTimer = setTimeout(() => {
+          alert('⏰ Session expired (12 hours). Please login again.');
+          performLogout();
+        }, delay);
+      }
+
+      // ---------- Session & Login/Logout ----------
+      function saveSession(username) {
+        const expiry = Date.now() + 12 * 60 * 60 * 1000;
+        localStorage.setItem(SESSION_KEY, JSON.stringify({ username, expiry }));
+        localStorage.setItem(USERNAME_STORAGE, username);
+        startAutoLogout(expiry);
+      }
+
+      function checkSessionValid() {
+        const session = JSON.parse(localStorage.getItem(SESSION_KEY) || '{}');
+        if (!session.username || !session.expiry) return false;
+        if (Date.now() > session.expiry) {
+          localStorage.removeItem(SESSION_KEY);
+          return false;
+        }
+        return true;
+      }
+
+      function performLogout() {
+        clearTimers();
+        localStorage.removeItem(SESSION_KEY);
+        mainApp.classList.add('hidden');
+        loginScreen.classList.remove('hidden');
+        const savedUser = localStorage.getItem(USERNAME_STORAGE);
+        if (savedUser) usernameInput.value = savedUser;
+        passwordInput.value = PASSWORD;
+      }
+
+      logoutButton.addEventListener('click', () => {
+        if (confirm('Are you sure you want to logout?')) {
+          performLogout();
+        }
+      });
+
+      function updateLiveUser(username) {
+        liveUsernameDisplay.textContent = `👤 ${username}`;
+      }
+
+      // ---------- Attendance Logic ----------
+      function setDateToday() {
         const today = new Date();
-        document.getElementById("date").value = today.toISOString().split("T")[0];
-        document.getElementById("currentDateDisplay").textContent = 
-            today.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-        
-        // Course data with students
-        const courseData = {
-            CSE101: [
-                {id: "221152001", name: "Imran Rahman"},
-                {id: "221152002", name: "Mahmud Hasan"},
-                {id: "221152003", name: "Rakib Ahmed"}
-            ],
-            CSE201: [
-                {id: "221152004", name: "Nayeem Islam"},
-                {id: "221152005", name: "Fahim Hossain"},
-                {id: "221152006", name: "Tanvir Ahmed"}
-            ],
-            CSE301: [
-                {id: "221152007", name: "Shuvo Das"},
-                {id: "221152008", name: "Sajid Rahman"},
-                {id: "221152009", name: "Arafat Hossain"}
-            ]
-        };
-        
-        // Get storage key
-        function getKey() {
-            const course = document.getElementById("course").value;
-            const date = document.getElementById("date").value;
-            return `attendance_${course}_${date}`;
-        }
-        
-        // Load students
-        function loadStudents() {
-            const course = document.getElementById("course").value;
-            
-            if (!course) {
-                alert("⚠️ Please select a course first!");
-                return;
-            }
-            
-            let saved = JSON.parse(localStorage.getItem(getKey())) || {};
-            
-            const container = document.getElementById("students");
-            container.innerHTML = "";
-            
-            if (!courseData[course]) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <div class="icon">📭</div>
-                        <h3>No students found</h3>
-                        <p>This course has no enrolled students</p>
-                    </div>`;
-                updateStats();
-                return;
-            }
-            
-            courseData[course].forEach(student => {
-                const value = saved[student.id] || 0;
-                
-                const row = document.createElement("div");
-                row.className = "student";
-                
-                row.innerHTML = `
-                    <div class="student-info">
-                        <div class="student-id">#${student.id}</div>
-                        <div class="student-name">👤 ${student.name}</div>
-                    </div>
-                    <button 
-                        class="toggle ${value ? 'present' : 'absent'}"
-                        data-id="${student.id}"
-                        onclick="toggleAttendance(this)">
-                        ${value ? '✓' : '✗'}
-                    </button>
-                `;
-                
-                container.appendChild(row);
-            });
-            
-            updateStats();
-        }
-        
-        // Toggle attendance
-        function toggleAttendance(btn) {
-            const currentValue = btn.classList.contains('present') ? 1 : 0;
-            const newValue = currentValue ? 0 : 1;
-            
-            // Add animation
-            btn.style.transform = 'scale(1.2)';
-            setTimeout(() => {
-                btn.style.transform = 'scale(1)';
-            }, 200);
-            
-            btn.className = `toggle ${newValue ? 'present' : 'absent'}`;
-            btn.textContent = newValue ? '✓' : '✗';
-            
-            saveAttendance();
-        }
-        
-        // Mark all
-        function markAll(value) {
-            const buttons = document.querySelectorAll(".toggle");
-            
-            if (buttons.length === 0) {
-                alert("⚠️ Please load students first!");
-                return;
-            }
-            
-            buttons.forEach(btn => {
-                btn.className = `toggle ${value ? 'present' : 'absent'}`;
-                btn.textContent = value ? '✓' : '✗';
-            });
-            
-            saveAttendance();
-            
-            // Show feedback
-            const message = value ? '✅ All marked present!' : '❌ All marked absent!';
-            showNotification(message);
-        }
-        
-        // Save to localStorage
-        function saveAttendance() {
-            const data = {};
-            
-            document.querySelectorAll(".toggle").forEach(btn => {
-                data[btn.dataset.id] = btn.classList.contains('present') ? 1 : 0;
-            });
-            
-            localStorage.setItem(getKey(), JSON.stringify(data));
-            updateStats();
-        }
-        
-        // Update statistics
-        function updateStats() {
-            const buttons = document.querySelectorAll(".toggle");
-            const total = buttons.length;
-            const present = document.querySelectorAll(".present").length;
-            const absent = total - present;
-            
-            document.getElementById("total").textContent = total;
-            document.getElementById("present").textContent = present;
-            document.getElementById("absent").textContent = absent;
-        }
-        
-        // Notification
-        function showNotification(message) {
-            const notification = document.createElement('div');
-            notification.style.cssText = `
-                position: fixed;
-                top: 20px;
-                left: 50%;
-                transform: translateX(-50%);
-                background: #333;
-                color: white;
-                padding: 12px 24px;
-                border-radius: 50px;
-                font-weight: 600;
-                z-index: 2000;
-                animation: fadeIn 0.3s ease;
-            `;
-            notification.textContent = message;
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.style.opacity = '0';
-                notification.style.transition = 'opacity 0.3s';
-                setTimeout(() => notification.remove(), 300);
-            }, 2000);
-        }
-        
-        // Event listeners
-        document.getElementById("course").addEventListener("change", loadStudents);
-        document.getElementById("date").addEventListener("change", function() {
-            const course = document.getElementById("course").value;
-            if (course) loadStudents();
+        datePicker.value = today.toISOString().split('T')[0];
+        currentDateDisplay.textContent = today.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+      }
+
+      function getStorageKey() {
+        return `att_${courseSelect.value}_${datePicker.value}`;
+      }
+
+      function updateStats() {
+        const btns = document.querySelectorAll('.toggle-btn');
+        const total = btns.length;
+        const present = document.querySelectorAll('.present-bg').length;
+        totalStat.textContent = total;
+        presentStat.textContent = present;
+        absentStat.textContent = total - present;
+      }
+
+      function saveAttendanceToLocal() {
+        const data = {};
+        document.querySelectorAll('.toggle-btn').forEach(btn => {
+          data[btn.dataset.id] = btn.classList.contains('present-bg') ? 1 : 0;
         });
-        
-        // PWA Install prompt
-        let deferredPrompt;
-        const installBtn = document.getElementById('installBtn');
-        
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            installBtn.style.display = 'block';
-        });
-        
-        installBtn.addEventListener('click', async () => {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
-                if (outcome === 'accepted') {
-                    installBtn.style.display = 'none';
-                }
-                deferredPrompt = null;
-            }
-        });
-        
-        window.addEventListener('appinstalled', () => {
-            installBtn.style.display = 'none';
-            deferredPrompt = null;
-        });
-        
-        // Register Service Worker
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('service-worker.js')
-                    .then(reg => console.log('Service Worker registered'))
-                    .catch(err => console.log('Service Worker error:', err));
-            });
+        if (courseSelect.value && datePicker.value) {
+          localStorage.setItem(getStorageKey(), JSON.stringify(data));
         }
-    </script>
+        updateStats();
+      }
+
+      function renderStudents(course) {
+        if (!course || !courseData[course]) {
+          studentContainer.innerHTML = `<p style="padding:20px;color:var(--text-secondary);">No students available.</p>`;
+          updateStats();
+          return;
+        }
+        const saved = JSON.parse(localStorage.getItem(getStorageKey()) || '{}');
+        let html = '';
+        courseData[course].forEach(s => {
+          const val = saved[s.id] || 0;
+          html += `
+            <div class="student">
+              <div><strong>#${s.id}</strong><br><small>${s.name}</small></div>
+              <button class="toggle toggle-btn ${val ? 'present-bg' : 'absent-bg'}" data-id="${s.id}">${val ? '✓' : '✗'}</button>
+            </div>`;
+        });
+        studentContainer.innerHTML = html;
+        document.querySelectorAll('.toggle-btn').forEach(btn => {
+          btn.addEventListener('click', function() {
+            this.classList.toggle('present-bg');
+            this.classList.toggle('absent-bg');
+            this.textContent = this.classList.contains('present-bg') ? '✓' : '✗';
+            saveAttendanceToLocal();
+          });
+        });
+        updateStats();
+      }
+
+      function loadStudentsAction() {
+        if (!courseSelect.value) { alert('Select a course'); return; }
+        localStorage.setItem(COURSE_STORAGE, courseSelect.value);
+        renderStudents(courseSelect.value);
+      }
+
+      function markAll(status) {
+        const btns = document.querySelectorAll('.toggle-btn');
+        if (!btns.length) { alert('Load students first'); return; }
+        btns.forEach(b => {
+          b.classList.remove('present-bg', 'absent-bg');
+          b.classList.add(status ? 'present-bg' : 'absent-bg');
+          b.textContent = status ? '✓' : '✗';
+        });
+        saveAttendanceToLocal();
+      }
+
+      // ----- Final Submit (saves final snapshot) -----
+      function finalSubmit() {
+        const course = courseSelect.value;
+        const date = datePicker.value;
+        if (!course || !date) {
+          alert('Please select a course and date before final submit.');
+          return;
+        }
+        const btns = document.querySelectorAll('.toggle-btn');
+        if (btns.length === 0) {
+          alert('No students loaded. Load students first.');
+          return;
+        }
+        const finalData = {};
+        btns.forEach(btn => {
+          finalData[btn.dataset.id] = btn.classList.contains('present-bg') ? 1 : 0;
+        });
+        const finalKey = FINAL_SUBMIT_PREFIX + course + '_' + date;
+        localStorage.setItem(finalKey, JSON.stringify(finalData));
+        alert(`✅ Final attendance submitted for ${course} on ${date}. (Stored locally)`);
+      }
+
+      // ---------- App Initialization ----------
+      function showMainApp(username) {
+        loginScreen.classList.add('hidden');
+        mainApp.classList.remove('hidden');
+        updateLiveUser(username);
+        setDateToday();
+        
+        // Restore course selection but NOT automatically reload attendance data
+        const savedCourse = localStorage.getItem(COURSE_STORAGE);
+        if (savedCourse && courseData[savedCourse]) {
+          courseSelect.value = savedCourse;
+          studentContainer.innerHTML = '';
+          updateStats();
+        } else {
+          courseSelect.value = '';
+          studentContainer.innerHTML = '';
+          updateStats();
+        }
+      }
+
+      function attemptLogin() {
+        const user = usernameInput.value.trim();
+        const pass = passwordInput.value;
+        if (!user) { alert('Please enter a username'); return; }
+        if (pass !== PASSWORD) { alert('Incorrect password'); return; }
+        saveSession(user);
+        showMainApp(user);
+      }
+
+      function initialCheck() {
+        if (checkSessionValid()) {
+          const session = JSON.parse(localStorage.getItem(SESSION_KEY));
+          const username = session.username;
+          usernameInput.value = username;
+          showMainApp(username);
+          startAutoLogout(session.expiry);
+        } else {
+          const lastUser = localStorage.getItem(USERNAME_STORAGE);
+          if (lastUser) usernameInput.value = lastUser;
+          passwordInput.value = PASSWORD;
+          loginScreen.classList.remove('hidden');
+          mainApp.classList.add('hidden');
+          clearTimers();
+        }
+      }
+
+      // Event Listeners
+      loginSubmitBtn.addEventListener('click', attemptLogin);
+      passwordInput.addEventListener('keypress', e => { if (e.key === 'Enter') attemptLogin(); });
+      loadBtn.addEventListener('click', loadStudentsAction);
+      document.getElementById('markAllPresent').addEventListener('click', () => markAll(1));
+      document.getElementById('markAllAbsent').addEventListener('click', () => markAll(0));
+      finalSubmitBtn.addEventListener('click', finalSubmit);
+      
+      courseSelect.addEventListener('change', () => {
+        if (courseSelect.value) {
+          localStorage.setItem(COURSE_STORAGE, courseSelect.value);
+          renderStudents(courseSelect.value);
+        }
+      });
+      datePicker.addEventListener('change', () => {
+        if (courseSelect.value) renderStudents(courseSelect.value);
+      });
+
+      // PWA install
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        installBtn.style.display = 'block';
+      });
+      installBtn.addEventListener('click', async () => {
+        if (deferredPrompt) {
+          deferredPrompt.prompt();
+          const { outcome } = await deferredPrompt.userChoice;
+          if (outcome === 'accepted') installBtn.style.display = 'none';
+          deferredPrompt = null;
+        }
+      });
+      window.addEventListener('appinstalled', () => { installBtn.style.display = 'none'; });
+
+      loadTheme();
+      initialCheck();
+    })();
+  </script>
 </body>
 </html>
