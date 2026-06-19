@@ -1,814 +1,531 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
-  <meta name="theme-color" content="#1e2a3a">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="UniERP Attendance">
-  <link rel="manifest" href="manifest.json">
-  <title>University ERP • Attendance Module</title>
-  <style>
-    /* style.css */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    :root {
-      --primary: #0f4c81;
-      --primary-light: #1e5a9e;
-      --primary-soft: #e8f0fa;
-      --success: #0f7b4e;
-      --danger: #b22234;
-      --warning: #e49b0f;
-      --gray-bg: #f4f6f9;
-      --card-white: #ffffff;
-      --text-main: #1e2a3a;
-      --text-secondary: #4a5c6c;
-      --border: #dce3ea;
-      --radius: 16px;
-      --shadow: 0 10px 25px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.02);
-      --transition: 0.2s ease;
-    }
-
-    body {
-      background: var(--gray-bg);
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-      color: var(--text-main);
-      line-height: 1.5;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 1.5rem;
-      min-height: 100vh;
-    }
-
-    .app-container {
-      max-width: 1350px;
-      width: 100%;
-      background: var(--card-white);
-      border-radius: 2.5rem;
-      box-shadow: var(--shadow);
-      padding: 1.8rem 2rem 2rem;
-      display: flex;
-      flex-direction: column;
-      gap: 1.8rem;
-    }
-
-    /* header */
-    .header {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      background: linear-gradient(105deg, var(--primary) 0%, #0a314a 100%);
-      border-radius: 1.8rem;
-      padding: 1.2rem 2rem;
-      color: white;
-      box-shadow: 0 8px 20px rgba(15, 76, 129, 0.25);
-    }
-
-    .logo-area {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    .logo-img {
-      width: 55px;
-      height: 55px;
-      background: white;
-      border-radius: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2rem;
-      font-weight: bold;
-      color: var(--primary);
-      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-      object-fit: contain;
-    }
-
-    .uni-details {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .uni-name {
-      font-size: 1.4rem;
-      font-weight: 700;
-      letter-spacing: -0.3px;
-    }
-
-    .dept-teacher {
-      font-size: 0.85rem;
-      opacity: 0.9;
-      display: flex;
-      gap: 1rem;
-      flex-wrap: wrap;
-    }
-
-    .date-time {
-      text-align: right;
-      font-weight: 500;
-    }
-
-    .current-date {
-      font-size: 1.2rem;
-      font-weight: 600;
-    }
-
-    .current-time {
-      font-size: 1.5rem;
-      font-weight: 700;
-      letter-spacing: 1px;
-    }
-
-    /* controls */
-    .controls-panel {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: flex-end;
-      gap: 1rem;
-      background: var(--primary-soft);
-      padding: 1.2rem 1.5rem;
-      border-radius: 1.5rem;
-    }
-
-    .control-group {
-      display: flex;
-      flex-direction: column;
-      gap: 0.3rem;
-      min-width: 140px;
-      flex: 1;
-    }
-
-    label {
-      font-weight: 600;
-      font-size: 0.75rem;
-      letter-spacing: 0.5px;
-      color: var(--primary);
-      text-transform: uppercase;
-    }
-
-    input, select, button {
-      padding: 0.7rem 1rem;
-      border-radius: 14px;
-      border: 1px solid var(--border);
-      background: white;
-      font-size: 0.95rem;
-      font-weight: 500;
-      transition: var(--transition);
-    }
-
-    input:focus, select:focus {
-      outline: none;
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(15,76,129,0.2);
-    }
-
-    .btn {
-      background: white;
-      font-weight: 600;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 0.3rem;
-      justify-content: center;
-      border: 1px solid var(--border);
-    }
-
-    .btn-primary {
-      background: var(--primary);
-      color: white;
-      border: none;
-      font-weight: 600;
-      box-shadow: 0 4px 10px rgba(15,76,129,0.3);
-    }
-
-    .btn-primary:hover {
-      background: var(--primary-light);
-    }
-
-    .kpi-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1.2rem;
-      margin: 0.2rem 0 0.5rem;
-    }
-
-    .kpi-card {
-      background: white;
-      border-radius: 1.5rem;
-      padding: 1.2rem 1.8rem;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.04);
-      display: flex;
-      flex-direction: column;
-      border: 1px solid var(--border);
-      flex: 1;
-      min-width: 130px;
-    }
-
-    .kpi-label {
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: var(--text-secondary);
-    }
-
-    .kpi-value {
-      font-size: 2.2rem;
-      font-weight: 700;
-    }
-
-    .bulk-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.7rem;
-      margin: 0.2rem 0;
-    }
-
-    .btn-sm {
-      padding: 0.5rem 1.2rem;
-      font-size: 0.85rem;
-    }
-
-    .student-table-wrapper {
-      overflow-x: auto;
-      border-radius: 1.5rem;
-      border: 1px solid var(--border);
-      background: white;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      white-space: nowrap;
-    }
-
-    th {
-      background: #f0f4fa;
-      font-weight: 700;
-      font-size: 0.8rem;
-      color: var(--primary);
-      padding: 1rem;
-      text-align: left;
-      cursor: pointer;
-      user-select: none;
-    }
-
-    td {
-      padding: 0.9rem 1rem;
-      border-bottom: 1px solid #edf1f7;
-    }
-
-    .student-avatar {
-      width: 38px;
-      height: 38px;
-      border-radius: 12px;
-      background: #d9e6f2;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-      color: var(--primary);
-    }
-
-    .attendance-box {
-      width: 52px;
-      height: 52px;
-      border-radius: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 800;
-      font-size: 1.3rem;
-      cursor: pointer;
-      transition: 0.15s ease;
-      background: var(--danger);
-      color: white;
-      user-select: none;
-    }
-
-    .attendance-box.present {
-      background: var(--success);
-    }
-
-    .search-sort-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.8rem;
-      align-items: center;
-    }
-
-    /* Modal styles */
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.5);
-      z-index: 1000;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .modal-overlay.active {
-      display: flex;
-    }
-
-    .settings-modal {
-      background: white;
-      padding: 1.8rem;
-      border-radius: 2rem;
-      box-shadow: 0 20px 35px rgba(0,0,0,0.2);
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      max-width: 400px;
-      width: 90%;
-      animation: slideIn 0.2s ease;
-    }
-
-    @keyframes slideIn {
-      from { transform: translateY(-20px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
-    }
-
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .close-btn {
-      background: none;
-      border: none;
-      font-size: 1.5rem;
-      cursor: pointer;
-      padding: 0.3rem;
-      line-height: 1;
-    }
-
-    @media (max-width: 700px) {
-      body { padding: 0.5rem; }
-      .app-container { padding: 1.2rem; }
-      .header { flex-direction: column; align-items: flex-start; gap: 0.8rem; }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <meta name="theme-color" content="#2196F3">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Attendance">
+    <link rel="manifest" href="manifest.json">
+    <title>Simple Attendance System</title>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 15px;
+            min-height: 100vh;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 25px;
+            padding: 25px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #f0f0f0;
+        }
+        
+        .header h1 {
+            font-size: 2rem;
+            color: #667eea;
+            margin-bottom: 8px;
+        }
+        
+        .header .date-display {
+            color: #666;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+        
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+        
+        .control-row {
+            display: flex;
+            gap: 10px;
+        }
+        
+        select, input, button {
+            padding: 14px 18px;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            font-size: 16px;
+            font-family: inherit;
+            transition: all 0.3s;
+            background: white;
+            width: 100%;
+        }
+        
+        select:focus, input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102,126,234,0.1);
+        }
+        
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102,126,234,0.3);
+        }
+        
+        button:active {
+            transform: scale(0.97);
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin: 25px 0;
+            text-align: center;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 18px 12px;
+            border-radius: 18px;
+            transition: all 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+        
+        .stat-number {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: #667eea;
+        }
+        
+        .stat-label {
+            font-size: 0.85rem;
+            color: #555;
+            margin-top: 8px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .student {
+            background: #f8f9fa;
+            padding: 16px;
+            margin-bottom: 12px;
+            border-radius: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+        
+        .student:hover {
+            border-color: #667eea;
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .student-info {
+            flex: 1;
+        }
+        
+        .student-id {
+            font-weight: 700;
+            font-size: 1.15rem;
+            color: #333;
+        }
+        
+        .student-name {
+            color: #666;
+            font-size: 0.95rem;
+            margin-top: 5px;
+            font-weight: 500;
+        }
+        
+        .toggle {
+            width: 65px;
+            height: 65px;
+            border: none;
+            border-radius: 18px;
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        
+        .toggle:hover {
+            transform: scale(1.1);
+        }
+        
+        .toggle:active {
+            transform: scale(0.9);
+        }
+        
+        .absent {
+            background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
+        }
+        
+        .present {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: #999;
+        }
+        
+        .empty-state .icon {
+            font-size: 4rem;
+            margin-bottom: 15px;
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin: 18px 0;
+            flex-wrap: wrap;
+        }
+        
+        .action-btn {
+            flex: 1;
+            min-width: 130px;
+            padding: 12px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        
+        .install-btn {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+            border-radius: 50px;
+            padding: 12px 24px;
+            font-weight: 700;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            z-index: 1000;
+            animation: slideUp 0.5s ease;
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(100px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        @media (max-width: 480px) {
+            body { padding: 10px; }
+            .container { padding: 18px; border-radius: 20px; }
+            .toggle { width: 60px; height: 60px; font-size: 24px; }
+            .stat-number { font-size: 1.8rem; }
+            .header h1 { font-size: 1.6rem; }
+        }
+    </style>
 </head>
 <body>
-<div class="app-container">
-  <!-- Header -->
-  <header class="header">
-    <div class="logo-area">
-      <div class="logo-img" id="logoDisplay">🏛️</div>
-      <div class="uni-details">
-        <span class="uni-name" id="uniNameDisplay">Global University</span>
-        <span class="dept-teacher">
-          <span id="deptDisplay">Computer Science</span> • 
-          <span id="teacherDisplay">Dr. Elena Torres</span>
-        </span>
-      </div>
+    <div class="container">
+        <div class="header">
+            <h1>📋 Attendance System</h1>
+            <div class="date-display" id="currentDateDisplay"></div>
+        </div>
+        
+        <div class="controls">
+            <div class="control-row">
+                <input type="date" id="date" style="flex:1">
+                <select id="course" style="flex:1">
+                    <option value="">📚 Select Course</option>
+                    <option value="CSE101">💻 CSE101 - Programming</option>
+                    <option value="CSE201">🗄️ CSE201 - Database</option>
+                    <option value="CSE301">🌐 CSE301 - Networking</option>
+                </select>
+            </div>
+            <button onclick="loadStudents()">📥 Load Students</button>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="total">0</div>
+                <div class="stat-label">Total</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="present" style="color:#11998e">0</div>
+                <div class="stat-label">Present</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="absent" style="color:#ff416c">0</div>
+                <div class="stat-label">Absent</div>
+            </div>
+        </div>
+        
+        <div class="action-buttons">
+            <button class="action-btn" onclick="markAll(1)">✅ All Present</button>
+            <button class="action-btn" onclick="markAll(0)">❌ All Absent</button>
+        </div>
+        
+        <div id="students"></div>
     </div>
-    <div class="date-time">
-      <div class="current-date" id="currentDate"></div>
-      <div class="current-time" id="currentTime"></div>
-    </div>
-  </header>
-
-  <!-- Controls -->
-  <div class="controls-panel">
-    <div class="control-group">
-      <label>📅 Date</label>
-      <input type="date" id="attendanceDate">
-    </div>
-    <div class="control-group">
-      <label>📘 Course</label>
-      <select id="courseSelect"></select>
-    </div>
-    <div class="control-group">
-      <label>🔍 Search</label>
-      <input type="text" id="searchInput" placeholder="ID, name or batch...">
-    </div>
-    <button class="btn btn-primary" id="loadBtn">📋 Load Attendance</button>
-    <button class="btn" id="settingsBtn" title="Settings">⚙️</button>
-  </div>
-
-  <!-- KPI cards -->
-  <div class="kpi-row">
-    <div class="kpi-card"><span class="kpi-label">👥 Total</span><span class="kpi-value" id="totalStudents">0</span></div>
-    <div class="kpi-card"><span class="kpi-label">✅ Present</span><span class="kpi-value" style="color:var(--success)" id="presentCount">0</span></div>
-    <div class="kpi-card"><span class="kpi-label">❌ Absent</span><span class="kpi-value" style="color:var(--danger)" id="absentCount">0</span></div>
-    <div class="kpi-card"><span class="kpi-label">📊 Percentage</span><span class="kpi-value" id="attendancePercent">0%</span></div>
-  </div>
-
-  <!-- Bulk & sort -->
-  <div class="bulk-actions">
-    <button class="btn btn-sm" id="markAllPresent">✅ All Present</button>
-    <button class="btn btn-sm" id="markAllAbsent">❌ All Absent</button>
-    <button class="btn btn-sm" id="invertSelection">🔄 Invert</button>
-    <button class="btn btn-sm" id="resetAttendance">🗑️ Reset</button>
-    <span style="flex:1;"></span>
-    <div class="search-sort-row">
-      <select id="sortSelect" class="btn-sm">
-        <option value="idAsc">ID ↑</option>
-        <option value="idDesc">ID ↓</option>
-        <option value="nameAsc">Name A-Z</option>
-        <option value="nameDesc">Name Z-A</option>
-      </select>
-      <button class="btn btn-sm" id="exportJSON">📦 JSON</button>
-      <button class="btn btn-sm" id="exportCSV">📄 CSV</button>
-    </div>
-  </div>
-
-  <!-- Student table -->
-  <div class="student-table-wrapper">
-    <table>
-      <thead>
-         <tr>
-            <th>Avatar</th><th>Student ID</th><th>Name</th><th>Batch</th><th>Dept</th><th>Attendance</th>
-         </tr>
-      </thead>
-      <tbody id="studentTableBody"></tbody>
-    </table>
-  </div>
-</div>
-
-<!-- Modal Overlay -->
-<div class="modal-overlay" id="settingsModal">
-  <div class="settings-modal">
-    <div class="modal-header">
-      <h3>⚙️ Institution Settings</h3>
-      <button class="close-btn" id="closeModalBtn">✕</button>
-    </div>
-    <input type="text" id="setUniName" placeholder="University Name">
-    <input type="text" id="setDept" placeholder="Department">
-    <input type="text" id="setTeacher" placeholder="Teacher Name">
-    <input type="text" id="setLogoEmoji" placeholder="Logo emoji (e.g. 🎓)">
-    <div style="display: flex; gap: 0.8rem; justify-content: flex-end;">
-      <button class="btn" id="cancelSettings">Cancel</button>
-      <button class="btn btn-primary" id="saveSettings">Save Settings</button>
-    </div>
-  </div>
-</div>
-
-<script>
-  // ---------- services.js (Data Layer) ----------
-  const AttendanceService = (() => {
-    const STORAGE_ATTENDANCE = 'erp_attendance';
-    const STORAGE_SETTINGS = 'erp_settings';
-
-    // Mock courses
-    const mockCourses = [
-      { id: 'CS101', name: 'Data Structures' },
-      { id: 'CS202', name: 'Algorithms' },
-      { id: 'MA105', name: 'Linear Algebra' }
-    ];
-
-    // Mock students
-    const mockStudents = {
-      'CS101': [
-        { id: 'STU001', name: 'Alice Johnson', batch: '2025', dept: 'Computer Science' },
-        { id: 'STU002', name: 'Bob Williams', batch: '2025', dept: 'Computer Science' },
-        { id: 'STU003', name: 'Clara Martinez', batch: '2026', dept: 'Computer Science' },
-        { id: 'STU004', name: 'David Lee', batch: '2025', dept: 'Computer Science' }
-      ],
-      'CS202': [
-        { id: 'STU005', name: 'Elena Garcia', batch: '2025', dept: 'Computer Science' },
-        { id: 'STU006', name: 'Frank Brown', batch: '2026', dept: 'Computer Science' }
-      ],
-      'MA105': [
-        { id: 'STU007', name: 'Grace Kim', batch: '2026', dept: 'Mathematics' },
-        { id: 'STU008', name: 'Henry Patel', batch: '2025', dept: 'Mathematics' }
-      ]
-    };
-
-    const getCourses = () => Promise.resolve(mockCourses);
-
-    const getStudents = (courseId) => {
-      return Promise.resolve(mockStudents[courseId] || []);
-    };
-
-    const getAttendance = (courseId, date) => {
-      const stored = localStorage.getItem(STORAGE_ATTENDANCE);
-      const all = stored ? JSON.parse(stored) : {};
-      const key = `${courseId}_${date}`;
-      return Promise.resolve(all[key] || {});
-    };
-
-    const saveAttendance = (courseId, date, attendanceMap) => {
-      const stored = localStorage.getItem(STORAGE_ATTENDANCE);
-      const all = stored ? JSON.parse(stored) : {};
-      const key = `${courseId}_${date}`;
-      all[key] = attendanceMap;
-      localStorage.setItem(STORAGE_ATTENDANCE, JSON.stringify(all));
-      return Promise.resolve(true);
-    };
-
-    const exportAttendanceJSON = (courseId, date, students, attendanceMap) => {
-      const data = students.map(s => ({
-        studentId: s.id,
-        name: s.name,
-        status: attendanceMap[s.id] === 1 ? 'Present' : 'Absent'
-      }));
-      return JSON.stringify({ courseId, date, records: data }, null, 2);
-    };
-
-    const exportAttendanceCSV = (courseId, date, students, attendanceMap) => {
-      let csv = 'Student ID,Name,Status\n';
-      students.forEach(s => {
-        const status = attendanceMap[s.id] === 1 ? 'Present' : 'Absent';
-        csv += `${s.id},${s.name},${status}\n`;
-      });
-      return csv;
-    };
-
-    const getSettings = () => {
-      const def = {
-        uniName: 'Global University',
-        department: 'Computer Science',
-        teacher: 'Dr. Elena Torres',
-        logo: '🏛️'
-      };
-      const saved = localStorage.getItem(STORAGE_SETTINGS);
-      return saved ? { ...def, ...JSON.parse(saved) } : def;
-    };
-
-    const saveSettings = (settings) => {
-      localStorage.setItem(STORAGE_SETTINGS, JSON.stringify(settings));
-      return Promise.resolve();
-    };
-
-    return { getCourses, getStudents, getAttendance, saveAttendance, exportAttendanceJSON, exportAttendanceCSV, getSettings, saveSettings };
-  })();
-
-  // ---------- script.js (UI Layer) ----------
-  (function() {
-    // DOM Elements
-    const dateInput = document.getElementById('attendanceDate');
-    const courseSelect = document.getElementById('courseSelect');
-    const searchInput = document.getElementById('searchInput');
-    const loadBtn = document.getElementById('loadBtn');
-    const studentBody = document.getElementById('studentTableBody');
-    const totalSpan = document.getElementById('totalStudents');
-    const presentSpan = document.getElementById('presentCount');
-    const absentSpan = document.getElementById('absentCount');
-    const percentSpan = document.getElementById('attendancePercent');
-    const uniNameDisplay = document.getElementById('uniNameDisplay');
-    const deptDisplay = document.getElementById('deptDisplay');
-    const teacherDisplay = document.getElementById('teacherDisplay');
-    const logoDisplay = document.getElementById('logoDisplay');
-    const sortSelect = document.getElementById('sortSelect');
     
-    // Modal elements
-    const settingsModal = document.getElementById('settingsModal');
-    const settingsBtn = document.getElementById('settingsBtn');
-    const closeModalBtn = document.getElementById('closeModalBtn');
-    const cancelSettingsBtn = document.getElementById('cancelSettings');
-    const saveSettingsBtn = document.getElementById('saveSettings');
-    const setUniName = document.getElementById('setUniName');
-    const setDept = document.getElementById('setDept');
-    const setTeacher = document.getElementById('setTeacher');
-    const setLogoEmoji = document.getElementById('setLogoEmoji');
+    <button class="install-btn" id="installBtn">📱 Install App</button>
 
-    let currentCourseId = null;
-    let currentDate = new Date().toISOString().slice(0,10);
-    let students = [];
-    let attendanceMap = {};
-
-    // Modal functions
-    function openModal() {
-      const s = AttendanceService.getSettings();
-      setUniName.value = s.uniName;
-      setDept.value = s.department;
-      setTeacher.value = s.teacher;
-      setLogoEmoji.value = s.logo;
-      settingsModal.classList.add('active');
-    }
-
-    function closeModal() {
-      settingsModal.classList.remove('active');
-    }
-
-    // Close modal when clicking overlay
-    settingsModal.addEventListener('click', (e) => {
-      if (e.target === settingsModal) {
-        closeModal();
-      }
-    });
-
-    // Close with Escape key
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && settingsModal.classList.contains('active')) {
-        closeModal();
-      }
-    });
-
-    settingsBtn.addEventListener('click', openModal);
-    closeModalBtn.addEventListener('click', closeModal);
-    cancelSettingsBtn.addEventListener('click', closeModal);
-
-    saveSettingsBtn.addEventListener('click', () => {
-      const newSettings = {
-        uniName: setUniName.value.trim() || 'Global University',
-        department: setDept.value.trim() || 'Computer Science',
-        teacher: setTeacher.value.trim() || 'Dr. Elena Torres',
-        logo: setLogoEmoji.value.trim() || '🏛️'
-      };
-      
-      AttendanceService.saveSettings(newSettings).then(() => {
-        applySettingsToUI();
-        closeModal(); // This properly closes the modal after saving
-      });
-    });
-
-    // Helpers
-    function updateDateTime() {
-      const now = new Date();
-      document.getElementById('currentDate').textContent = now.toLocaleDateString('en-US', { weekday:'short', year:'numeric', month:'short', day:'numeric' });
-      document.getElementById('currentTime').textContent = now.toLocaleTimeString('en-US', { hour12: false });
-    }
-    setInterval(updateDateTime, 1000);
-    updateDateTime();
-
-    function applySettingsToUI() {
-      const s = AttendanceService.getSettings();
-      uniNameDisplay.textContent = s.uniName;
-      deptDisplay.textContent = s.department;
-      teacherDisplay.textContent = s.teacher;
-      logoDisplay.textContent = s.logo || '🏛️';
-    }
-    applySettingsToUI();
-
-    function updateStats() {
-      const total = students.length;
-      const present = Object.values(attendanceMap).filter(v => v === 1).length;
-      const absent = total - present;
-      totalSpan.textContent = total;
-      presentSpan.textContent = present;
-      absentSpan.textContent = absent;
-      percentSpan.textContent = total ? Math.round((present/total)*100) + '%' : '0%';
-    }
-
-    function getFilteredAndSortedStudents() {
-      let filtered = [...students];
-      const searchTerm = searchInput.value.toLowerCase().trim();
-      if (searchTerm) {
-        filtered = filtered.filter(s => 
-          s.id.toLowerCase().includes(searchTerm) || 
-          s.name.toLowerCase().includes(searchTerm) ||
-          s.batch.includes(searchTerm)
-        );
-      }
-      const sortBy = sortSelect.value;
-      if (sortBy === 'idAsc') filtered.sort((a,b) => a.id.localeCompare(b.id));
-      else if (sortBy === 'idDesc') filtered.sort((a,b) => b.id.localeCompare(a.id));
-      else if (sortBy === 'nameAsc') filtered.sort((a,b) => a.name.localeCompare(b.name));
-      else if (sortBy === 'nameDesc') filtered.sort((a,b) => b.name.localeCompare(a.name));
-      return filtered;
-    }
-
-    function renderTable() {
-      const displayStudents = getFilteredAndSortedStudents();
-      studentBody.innerHTML = '';
-      if (!displayStudents.length) {
-        studentBody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:2rem;">No students found.</td></tr>`;
-        updateStats();
-        return;
-      }
-      displayStudents.forEach(s => {
-        const status = attendanceMap[s.id] === 1 ? 1 : 0;
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td><div class="student-avatar">${s.name.charAt(0)}</div></td>
-          <td><strong>${s.id}</strong></td>
-          <td>${s.name}</td>
-          <td>${s.batch}</td>
-          <td>${s.dept}</td>
-          <td><div class="attendance-box ${status === 1 ? 'present' : ''}" data-student-id="${s.id}">${status}</div></td>
-        `;
-        studentBody.appendChild(row);
-      });
-
-      document.querySelectorAll('.attendance-box').forEach(box => {
-        box.addEventListener('click', function(e) {
-          const studentId = this.dataset.studentId;
-          if (!currentCourseId) return;
-          const currentVal = attendanceMap[studentId] || 0;
-          const newVal = currentVal === 1 ? 0 : 1;
-          attendanceMap[studentId] = newVal;
-          // Auto save immediately
-          AttendanceService.saveAttendance(currentCourseId, currentDate, attendanceMap).then(() => {
-            renderTable();
+    <script>
+        // Set today's date and display
+        const today = new Date();
+        document.getElementById("date").value = today.toISOString().split("T")[0];
+        document.getElementById("currentDateDisplay").textContent = 
+            today.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        
+        // Course data with students
+        const courseData = {
+            CSE101: [
+                {id: "221152001", name: "Imran Rahman"},
+                {id: "221152002", name: "Mahmud Hasan"},
+                {id: "221152003", name: "Rakib Ahmed"}
+            ],
+            CSE201: [
+                {id: "221152004", name: "Nayeem Islam"},
+                {id: "221152005", name: "Fahim Hossain"},
+                {id: "221152006", name: "Tanvir Ahmed"}
+            ],
+            CSE301: [
+                {id: "221152007", name: "Shuvo Das"},
+                {id: "221152008", name: "Sajid Rahman"},
+                {id: "221152009", name: "Arafat Hossain"}
+            ]
+        };
+        
+        // Get storage key
+        function getKey() {
+            const course = document.getElementById("course").value;
+            const date = document.getElementById("date").value;
+            return `attendance_${course}_${date}`;
+        }
+        
+        // Load students
+        function loadStudents() {
+            const course = document.getElementById("course").value;
+            
+            if (!course) {
+                alert("⚠️ Please select a course first!");
+                return;
+            }
+            
+            let saved = JSON.parse(localStorage.getItem(getKey())) || {};
+            
+            const container = document.getElementById("students");
+            container.innerHTML = "";
+            
+            if (!courseData[course]) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">📭</div>
+                        <h3>No students found</h3>
+                        <p>This course has no enrolled students</p>
+                    </div>`;
+                updateStats();
+                return;
+            }
+            
+            courseData[course].forEach(student => {
+                const value = saved[student.id] || 0;
+                
+                const row = document.createElement("div");
+                row.className = "student";
+                
+                row.innerHTML = `
+                    <div class="student-info">
+                        <div class="student-id">#${student.id}</div>
+                        <div class="student-name">👤 ${student.name}</div>
+                    </div>
+                    <button 
+                        class="toggle ${value ? 'present' : 'absent'}"
+                        data-id="${student.id}"
+                        onclick="toggleAttendance(this)">
+                        ${value ? '✓' : '✗'}
+                    </button>
+                `;
+                
+                container.appendChild(row);
+            });
+            
             updateStats();
-          });
+        }
+        
+        // Toggle attendance
+        function toggleAttendance(btn) {
+            const currentValue = btn.classList.contains('present') ? 1 : 0;
+            const newValue = currentValue ? 0 : 1;
+            
+            // Add animation
+            btn.style.transform = 'scale(1.2)';
+            setTimeout(() => {
+                btn.style.transform = 'scale(1)';
+            }, 200);
+            
+            btn.className = `toggle ${newValue ? 'present' : 'absent'}`;
+            btn.textContent = newValue ? '✓' : '✗';
+            
+            saveAttendance();
+        }
+        
+        // Mark all
+        function markAll(value) {
+            const buttons = document.querySelectorAll(".toggle");
+            
+            if (buttons.length === 0) {
+                alert("⚠️ Please load students first!");
+                return;
+            }
+            
+            buttons.forEach(btn => {
+                btn.className = `toggle ${value ? 'present' : 'absent'}`;
+                btn.textContent = value ? '✓' : '✗';
+            });
+            
+            saveAttendance();
+            
+            // Show feedback
+            const message = value ? '✅ All marked present!' : '❌ All marked absent!';
+            showNotification(message);
+        }
+        
+        // Save to localStorage
+        function saveAttendance() {
+            const data = {};
+            
+            document.querySelectorAll(".toggle").forEach(btn => {
+                data[btn.dataset.id] = btn.classList.contains('present') ? 1 : 0;
+            });
+            
+            localStorage.setItem(getKey(), JSON.stringify(data));
+            updateStats();
+        }
+        
+        // Update statistics
+        function updateStats() {
+            const buttons = document.querySelectorAll(".toggle");
+            const total = buttons.length;
+            const present = document.querySelectorAll(".present").length;
+            const absent = total - present;
+            
+            document.getElementById("total").textContent = total;
+            document.getElementById("present").textContent = present;
+            document.getElementById("absent").textContent = absent;
+        }
+        
+        // Notification
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: #333;
+                color: white;
+                padding: 12px 24px;
+                border-radius: 50px;
+                font-weight: 600;
+                z-index: 2000;
+                animation: fadeIn 0.3s ease;
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                notification.style.transition = 'opacity 0.3s';
+                setTimeout(() => notification.remove(), 300);
+            }, 2000);
+        }
+        
+        // Event listeners
+        document.getElementById("course").addEventListener("change", loadStudents);
+        document.getElementById("date").addEventListener("change", function() {
+            const course = document.getElementById("course").value;
+            if (course) loadStudents();
         });
-      });
-      updateStats();
-    }
-
-    async function loadAttendanceData() {
-      if (!currentCourseId) {
-        alert('Please select a course.');
-        return;
-      }
-      const stored = await AttendanceService.getAttendance(currentCourseId, currentDate);
-      attendanceMap = stored || {};
-      students = await AttendanceService.getStudents(currentCourseId);
-      // ensure all students have entry
-      students.forEach(s => { if (attendanceMap[s.id] === undefined) attendanceMap[s.id] = 0; });
-      renderTable();
-    }
-
-    // Event Listeners
-    dateInput.value = currentDate;
-    dateInput.addEventListener('change', (e) => {
-      currentDate = e.target.value;
-      if (currentCourseId) loadAttendanceData();
-    });
-
-    async function populateCourses() {
-      const courses = await AttendanceService.getCourses();
-      courseSelect.innerHTML = '<option value="">-- Select Course --</option>';
-      courses.forEach(c => {
-        const opt = document.createElement('option');
-        opt.value = c.id;
-        opt.textContent = `${c.id} - ${c.name}`;
-        courseSelect.appendChild(opt);
-      });
-    }
-    populateCourses();
-
-    courseSelect.addEventListener('change', (e) => {
-      currentCourseId = e.target.value;
-      if (currentCourseId) loadAttendanceData();
-      else {
-        students = [];
-        attendanceMap = {};
-        renderTable();
-      }
-    });
-
-    loadBtn.addEventListener('click', () => {
-      if (currentCourseId) loadAttendanceData();
-    });
-
-    searchInput.addEventListener('input', renderTable);
-    sortSelect.addEventListener('change', renderTable);
-
-    // Bulk actions
-    document.getElementById('markAllPresent').addEventListener('click', () => {
-      if (!currentCourseId) return;
-      students.forEach(s => attendanceMap[s.id] = 1);
-      AttendanceService.saveAttendance(currentCourseId, currentDate, attendanceMap).then(renderTable);
-    });
-    document.getElementById('markAllAbsent').addEventListener('click', () => {
-      if (!currentCourseId) return;
-      students.forEach(s => attendanceMap[s.id] = 0);
-      AttendanceService.saveAttendance(currentCourseId, currentDate, attendanceMap).then(renderTable);
-    });
-    document.getElementById('invertSelection').addEventListener('click', () => {
-      if (!currentCourseId) return;
-      students.forEach(s => attendanceMap[s.id] = attendanceMap[s.id] === 1 ? 0 : 1);
-      AttendanceService.saveAttendance(currentCourseId, currentDate, attendanceMap).then(renderTable);
-    });
-    document.getElementById('resetAttendance').addEventListener('click', () => {
-      if (!currentCourseId) return;
-      students.forEach(s => attendanceMap[s.id] = 0);
-      AttendanceService.saveAttendance(currentCourseId, currentDate, attendanceMap).then(renderTable);
-    });
-
-    // Export
-    document.getElementById('exportJSON').addEventListener('click', () => {
-      if (!currentCourseId) return;
-      const json = AttendanceService.exportAttendanceJSON(currentCourseId, currentDate, students, attendanceMap);
-      const blob = new Blob([json], {type:'application/json'});
-      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `attendance_${currentCourseId}_${currentDate}.json`; a.click();
-    });
-    document.getElementById('exportCSV').addEventListener('click', () => {
-      if (!currentCourseId) return;
-      const csv = AttendanceService.exportAttendanceCSV(currentCourseId, currentDate, students, attendanceMap);
-      const blob = new Blob([csv], {type:'text/csv'});
-      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `attendance_${currentCourseId}_${currentDate}.csv`; a.click();
-    });
-
-  })();
-</script>
-
-<!-- PWA Service Worker Registration -->
-<script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('service-worker.js').then(reg => {
-        console.log('Service Worker registered');
-      }).catch(err => console.log('SW error', err));
-    });
-  }
-</script>
+        
+        // PWA Install prompt
+        let deferredPrompt;
+        const installBtn = document.getElementById('installBtn');
+        
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installBtn.style.display = 'block';
+        });
+        
+        installBtn.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    installBtn.style.display = 'none';
+                }
+                deferredPrompt = null;
+            }
+        });
+        
+        window.addEventListener('appinstalled', () => {
+            installBtn.style.display = 'none';
+            deferredPrompt = null;
+        });
+        
+        // Register Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('service-worker.js')
+                    .then(reg => console.log('Service Worker registered'))
+                    .catch(err => console.log('Service Worker error:', err));
+            });
+        }
+    </script>
 </body>
 </html>
