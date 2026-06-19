@@ -1,4 +1,4 @@
-const CACHE_NAME = 'attendance-system-v3';
+const CACHE_NAME = 'kkbau_attendance-system-v3';
 const urlsToCache = [
     './',
     './index.html',
