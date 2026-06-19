@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Attendance System</title>
+
+<style>
+body{
+    font-family:Arial,sans-serif;
+    margin:20px;
+    background:#f5f5f5;
+}
+
+.container{
+    max-width:800px;
+    margin:auto;
+}
+
+.controls{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-bottom:20px;
+}
+
+select,input{
+    padding:10px;
+}
+
+.student{
+    background:white;
+    padding:12px;
+    margin-bottom:8px;
+    border-radius:8px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.toggle{
+    width:50px;
+    height:50px;
+    border:none;
+    color:white;
+    font-size:20px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.absent{
+    background:red;
+}
+
+.present{
+    background:green;
+}
+
+.stats{
+    margin:15px 0;
+    font-weight:bold;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<h2>Attendance System</h2>
+
+<div class="controls">
+    <input type="date" id="date">
+
+    <select id="course">
+        <option value="">Select Course</option>
+        <option value="CSE101">CSE101</option>
+        <option value="CSE201">CSE201</option>
+        <option value="CSE301">CSE301</option>
+    </select>
+
+    <button onclick="loadStudents()">Load Students</button>
+</div>
+
+<div class="stats">
+    Total:
+    <span id="total">0</span>
+
+    |
+    Present:
+    <span id="present">0</span>
+
+    |
+    Absent:
+    <span id="absent">0</span>
+</div>
+
+<div id="students"></div>
+
+</div>
+
+<script>
+
+document.getElementById("date").value =
+new Date().toISOString().split("T")[0];
+
+const courseData = {
+
+CSE101:[
+    {id:"221152001",name:"Imran Rahman"},
+    {id:"221152002",name:"Mahmud Hasan"},
+    {id:"221152003",name:"Rakib Ahmed"}
+],
+
+CSE201:[
+    {id:"221152004",name:"Nayeem Islam"},
+    {id:"221152005",name:"Fahim Hossain"},
+    {id:"221152006",name:"Tanvir Ahmed"}
+],
+
+CSE301:[
+    {id:"221152007",name:"Shuvo Das"},
+    {id:"221152008",name:"Sajid Rahman"},
+    {id:"221152009",name:"Arafat Hossain"}
+]
+
+};
+
+function getKey(){
+    return "attendance_" +
+    document.getElementById("course").value +
+    "_" +
+    document.getElementById("date").value;
+}
+
+function loadStudents(){
+
+    const course =
+    document.getElementById("course").value;
+
+    if(!course){
+        alert("Select Course");
+        return;
+    }
+
+    let saved =
+    JSON.parse(localStorage.getItem(getKey()));
+
+    if(!saved){
+        saved={};
+    }
+
+    const container =
+    document.getElementById("students");
+
+    container.innerHTML="";
+
+    courseData[course].forEach(student=>{
+
+        const value =
+        saved[student.id] || 0;
+
+        const row =
+        document.createElement("div");
+
+        row.className="student";
+
+        row.innerHTML=`
+            <div>
+                <b>${student.id}</b><br>
+                ${student.name}
+            </div>
+
+            <button
+                class="toggle ${value ? 'present':'absent'}"
+                data-id="${student.id}">
+                ${value}
+            </button>
+        `;
+
+        container.appendChild(row);
+
+    });
+
+    document
+    .querySelectorAll(".toggle")
+    .forEach(btn=>{
+
+        btn.onclick=function(){
+
+            let v =
+            parseInt(this.innerText);
+
+            v = v ? 0 : 1;
+
+            this.innerText=v;
+
+            this.className=
+            "toggle " +
+            (v ? "present":"absent");
+
+            saveAttendance();
+
+        };
+
+    });
+
+    updateStats();
+}
+
+function saveAttendance(){
+
+    const data={};
+
+    document
+    .querySelectorAll(".toggle")
+    .forEach(btn=>{
+
+        data[btn.dataset.id] =
+        parseInt(btn.innerText);
+
+    });
+
+    localStorage.setItem(
+        getKey(),
+        JSON.stringify(data)
+    );
+
+    updateStats();
+}
+
+function updateStats(){
+
+    const buttons =
+    document.querySelectorAll(".toggle");
+
+    let total = buttons.length;
+    let present = 0;
+
+    buttons.forEach(btn=>{
+        if(btn.innerText==="1"){
+            present++;
+        }
+    });
+
+    document.getElementById("total")
+    .innerText = total;
+
+    document.getElementById("present")
+    .innerText = present;
+
+    document.getElementById("absent")
+    .innerText = total-present;
+}
+
+</script>
+
+</body>
+</html>
